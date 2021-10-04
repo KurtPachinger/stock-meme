@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Stock Meme</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css'><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<form id="tools" class="fas fa-grip-lines" onSubmit="return false">
+  <!--modify-->
+  <fieldset id="ui">
+    <label class="fas fa-expand">
+      <span>hide</span>
+    </label>
+    <hr />
+    <label class="fas fa-trash">
+      <span>trash</span>
+    </label>
+    <label class="fas fa-layer-group">
+      <span>order</span>
+    </label>
+    <label class="fas fa-fill">
+      <span>color</span>
+      <input type="color" value="#8f8f8f" id="color" />
+    </label>
+    <label class="fas fa-running">
+      <span>motion</span>
+    </label>
+    <hr />
+    <label class="fas fa-eraser">
+      <span>erase</span>
+    </label>
+  </fieldset>
+  <!--create-->
+  <fieldset>
+    <label class="dir fas fa-font">
+      <span>text</span>
+    </label>
+    <div class="page current" data-title="font">
+      <div class="ico txt serif">
+        <p>A</p>
+      </div>
+      <div class="ico txt sans-serif">
+        <p>A</p>
+      </div>
+      <div class="ico txt monospace">
+        <p>A</p>
+      </div>
+      <div class="ico txt cursive">
+        <p>A</p>
+      </div>
+      <div class="ico txt fantasy">
+        <p>A</p>
+      </div>
+      <div class="ico txt system-ui">
+        <p>A</p>
+      </div>
+      <div class="ico txt fangsong">
+        <p>宋</p>
+      </div>
+      <div class="ico txt emoji">
+        <p>☺️</p>
+      </div>
+    </div>
+    <div class="page" data-title="bubbles">
+      <div class="ico fas fa-comment-alt"></div>
+      <div class="ico fas fa-comment"></div>
+      <div class="ico fas fa-comments"></div>
+      <div class="ico fas fa-sticky-note"></div>
+      <div class="ico fas fa-envelope-open"></div>
+      <div class="ico fas fa-clipboard"></div>
+      <div class="ico fas fa-scroll"></div>
+      <div class="ico fas fa-pager"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <label class="fas fa-camera">
+      <span>file</span>
+      <input type="file" id="camSrc" accept="image/*" multiple />
+    </label>
+    <div class="ico art fas fa-edit">
+      <canvas width="512" height="512"></canvas>
+    </div>
+    <div class="ico art fas fa-draw-polygon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <polygon points=""></polygon>
+      </svg>
+    </div>
+    <div id="camDst">
+      <!--<img class="ico art" />-->
+    </div>
+  </fieldset>
+  <fieldset>
+    <label class="dir fas fa-images">
+      <span>stencil</span>
+    </label>
+    <div class="page current" data-title="avatar">
+      <div class="ico fas fa-smile"></div>
+      <div class="ico fas fa-angry"></div>
+      <div class="ico fas fa-flushed"></div>
+      <div class="ico fas fa-dizzy"></div>
+      <div class="ico fas fa-glasses"></div>
+      <div class="ico fas fa-headphones"></div>
+      <div class="ico fas fa-crown"></div>
+      <div class="ico fas fa-hat-wizard"></div>
+      <div class="ico fas fa-crow"></div>
+      <div class="ico fas fa-dog"></div>
+      <div class="ico fas fa-cat"></div>
+      <div class="ico fas fa-horse"></div>
+      <div class="ico fas fa-baby"></div>
+      <div class="ico fas fa-tshirt"></div>
+      <div class="ico fas fa-hand-peace"></div>
+      <div class="ico fas fa-paw"></div>
+      <div class="ico fas fa-skull"></div>
+      <div class="ico fas fa-snowman"></div>
+    </div>
+    <div class="page" data-title="props">
+      <div class="ico fas fa-heart"></div>
+      <div class="ico fas fa-ban"></div>
+      <div class="ico fas fa-gem"></div>
+      <div class="ico fas fa-bomb"></div>
+      <div class="ico fas fa-carrot"></div>
+      <div class="ico fas fa-candy-cane"></div>
+      <div class="ico fas fa-cheese"></div>
+      <div class="ico fas fa-cookie"></div>
+      <div class="ico fas fa-drumstick-bite"></div>
+      <div class="ico fas fa-bone"></div>
+      <div class="ico fas fa-hamburger"></div>
+      <div class="ico fas fa-bullhorn"></div>
+      <div class="ico fas fa-syringe"></div>
+      <div class="ico fas fa-compact-disc"></div>
+      <div class="ico fas fa-chair"></div>
+      <div class="ico fas fa-couch"></div>
+      <div class="ico fas fa-toilet-paper"></div>
+      <div class="ico fas fa-glass-martini"></div>
+      <div class="ico fas fa-book"></div>
+      <div class="ico fas fa-phone"></div>
+    </div>
+    <div class="page" data-title="activity">
+      <div class="ico fas fa-futbol"></div>
+      <div class="ico fas fa-basketball-ball"></div>
+      <div class="ico fas fa-volleyball-ball"></div>
+      <div class="ico fas fa-baseball-ball"></div>
+      <div class="ico fas fa-bowling-ball"></div>
+      <div class="ico fas fa-football-ball"></div>
+      <div class="ico fas fa-table-tennis"></div>
+      <div class="ico fas fa-life-ring"></div>
+      <div class="ico fas fa-snowboarding"></div>
+      <div class="ico fas fa-skiing"></div>
+      <div class="ico fas fa-skating"></div>
+      <div class="ico fas fa-hiking"></div>
+      <div class="ico fas fa-bicycle"></div>
+      <div class="ico fas fa-car"></div>
+      <div class="ico fas fa-space-shuttle"></div>
+      <div class="ico fas fa-binoculars"></div>
+      <div class="ico fas fa-drum"></div>
+      <div class="ico fas fa-award"></div>
+      <div class="ico fas fa-feather"></div>
+      <div class="ico fas fa-fish"></div>
+      <div class="ico fas fa-graduation-cap"></div>
+      <div class="ico fas fa-guitar"></div>
+      <div class="ico fas fa-hammer"></div>
+      <div class="ico fas fa-palette"></div>
+    </div>
+  </fieldset>
+
+</form>
+
+<div id="artboard">
+  <!--assets cloned here-->
+</div>
+<!-- partial -->
+  <script type="module" src="./script.js"></script>
+
+</body>
+</html>

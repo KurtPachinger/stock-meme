@@ -1,0 +1,324 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sel .art {
+  padding: 32px;
+  display: flex;
+}
+
+.art {
+  width: 100%;
+  height: 100%;
+}
+.art:before {
+  position: absolute;
+  font-size: 32px;
+  top: 0;
+  left: 0;
+}
+.art img,
+.art canvas,
+.art svg {
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIElEQVQYV2Nk+M/QwMDI0MAABYxgGkkQIoAkiBCACgIABm4HhEEa4PgAAAAASUVORK5CYII=");
+}
+
+svg polygon {
+  stroke: black;
+}
+
+fieldset,
+label > span {
+  font-size: 0.75rem;
+  font-family: sans-serif;
+}
+
+html {
+  font-size: 0.875rem;
+}
+
+body {
+  overflow: hidden;
+}
+body .w50 {
+  width: 50%;
+  float: left;
+}
+body fieldset {
+  font-weight: normal;
+  color: #8f8f8f;
+  border: none;
+  margin-bottom: 0.125rem;
+}
+body fieldset label span {
+  pointer-events: none;
+}
+body fieldset label,
+body fieldset :before {
+  line-height: 1;
+  vertical-align: middle;
+}
+body hr {
+  border: 0;
+  border-top: 0.125rem solid #8f8f8f;
+  margin: 0.25rem auto;
+  width: 50%;
+  opacity: 0.5;
+}
+body input,
+body button,
+body label {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: none;
+  width: 100%;
+  margin-bottom: 0.125rem;
+  padding: 0.5rem 0.25rem;
+  background-color: #8f8f8f;
+  color: #dfdfdf;
+  white-space: nowrap;
+  line-height: 2;
+}
+body input input[type=file],
+body input input[type=color],
+body button input[type=file],
+body button input[type=color],
+body label input[type=file],
+body label input[type=color] {
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  z-index: -9;
+}
+body input:hover, body input:active,
+body button:hover,
+body button:active,
+body label:hover,
+body label:active {
+  background-color: #808080;
+  cursor: pointer;
+}
+body #next {
+  margin: 0 auto;
+}
+body #artboard.edit .sel {
+  opacity: 1;
+}
+body .sel {
+  position: absolute;
+}
+body .sel:hover {
+  box-shadow: #dfdfdf -0.25rem -0.25rem 0px 0.25rem inset;
+}
+body .sel:not(:hover):not(.edit) {
+  opacity: 0.5;
+}
+body .ico,
+body .sel {
+  touch-action: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  float: left;
+  text-align: center;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  background-color: rgba(128, 128, 128, 0.125);
+  border-radius: 0.25rem;
+}
+body .ico:before,
+body .sel:before {
+  z-index: 3;
+  position: relative;
+  width: 200%;
+  display: block;
+  margin-left: -50%;
+}
+body .ico.txt,
+body .ico .txt,
+body .sel.txt,
+body .sel .txt {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+body .ico.txt.serif,
+body .ico .txt.serif,
+body .sel.txt.serif,
+body .sel .txt.serif {
+  font-family: serif;
+}
+body .ico.txt.sans-serif,
+body .ico .txt.sans-serif,
+body .sel.txt.sans-serif,
+body .sel .txt.sans-serif {
+  font-family: sans-serif;
+}
+body .ico.txt.monospace,
+body .ico .txt.monospace,
+body .sel.txt.monospace,
+body .sel .txt.monospace {
+  font-family: monospace;
+}
+body .ico.txt.cursive,
+body .ico .txt.cursive,
+body .sel.txt.cursive,
+body .sel .txt.cursive {
+  font-family: cursive;
+}
+body .ico.txt.fantasy,
+body .ico .txt.fantasy,
+body .sel.txt.fantasy,
+body .sel .txt.fantasy {
+  font-family: fantasy;
+}
+body .ico.txt.system-ui,
+body .ico .txt.system-ui,
+body .sel.txt.system-ui,
+body .sel .txt.system-ui {
+  font-family: system-ui;
+}
+body .ico.txt.fangsong,
+body .ico .txt.fangsong,
+body .sel.txt.fangsong,
+body .sel .txt.fangsong {
+  font-family: fangsong;
+}
+body .ico.txt.emoji,
+body .ico .txt.emoji,
+body .sel.txt.emoji,
+body .sel .txt.emoji {
+  font-family: emoji;
+}
+body #tools {
+  position: absolute;
+  z-index: 3;
+  width: 128px;
+  background-color: #dfdfdf;
+}
+body #tools:before {
+  text-align: center;
+  display: block;
+  color: #8f8f8f;
+}
+body #tools .ico:nth-of-type(4n + 1) {
+  clear: left;
+}
+body #tools.zoom {
+  width: 64px;
+}
+body #tools.zoom #ui label {
+  text-align: center;
+}
+body #tools.zoom #ui label span {
+  display: none;
+}
+body #tools.zoom .ico:nth-of-type(2n + 1) {
+  clear: left;
+}
+body #tools .drop-target {
+  position: relative;
+  z-index: 9;
+  background-color: #dfdfdf;
+}
+body #tools .drop-active {
+  box-shadow: rgba(0, 0, 0, 0.5) -0.25rem 0 0 -1px inset;
+}
+body #tools .ico {
+  box-shadow: #dfdfdf 0px 0px 0px 0.25rem inset;
+}
+body #tools .ico {
+  opacity: 0.5;
+  transition: transform 0.125s ease-out;
+}
+body #tools .ico canvas,
+body #tools .ico svg {
+  display: none;
+}
+body #tools .ico:before,
+body #tools .ico img,
+body #tools .ico p {
+  transform: scale(0.5);
+}
+body #tools .ico:hover:before,
+body #tools .ico:hover img,
+body #tools .ico:hover p, body #tools .ico.drop-target:before,
+body #tools .ico.drop-target img,
+body #tools .ico.drop-target p {
+  transform: scale(1);
+}
+body #tools .ico:hover {
+  opacity: 1;
+}
+body #tools .page {
+  display: none;
+}
+body #tools .page.current {
+  display: block;
+}
+body #tools .page[data-title]:before {
+  content: attr(data-title);
+  display: block;
+  padding: 0.25rem;
+}
+body #tools #ui {
+  position: absolute;
+  left: 100%;
+  width: 50%;
+  padding: 0.25rem;
+  background-color: #dfdfdf;
+  z-index: 9;
+}
+body #artboard {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  -ms-interpolation-mode: nearest-neighbor;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: pixelated;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAABxJREFUKFNjZCASMBKpjmFUId6QIip4Hjx48B8AE0gDqvMYQX4AAAAASUVORK5CYII=);
+}
+body #artboard.drop-active {
+  background-color: rgba(128, 240, 128, 0.125);
+}
+body #artboard .sel .txt {
+  text-align: left;
+}
+
+[class*=ico] {
+  position: relative;
+}
+[class*=ico]:after {
+  font-family: monospace !important;
+  color: #dfdfdf;
+  background: #808080;
+  content: attr(class);
+  position: absolute;
+  top: 0;
+  left: 100%;
+  font-size: 1rem;
+  white-space: pre;
+  opacity: 0;
+  z-index: 99;
+  overflow: hidden;
+  pointer-events: none;
+}
+[class*=ico]:not(.drop-target):hover:after {
+  opacity: 1;
+  transition: opacity 0.25s linear 0.5s;
+}
