@@ -1,4 +1,3 @@
-//todo: html2canvas, gifshot
 import interact from "//cdn.interactjs.io/v1.10.11/interactjs/index.js";
 
 const unit = 64;
@@ -29,12 +28,15 @@ interact("#artboard").dropzone({
     wrap.setAttribute("data-y", cr.y);
 
     wrap.style = "transform:translate(" + cr.x + "px," + cr.y + "px);";
+
     // offset from layout flow
     //clone.style.position = "absolute";
     //clone.style.left = (original.offsetLeft + tools.x ) + "px";
     //clone.style.top = (original.offsetTop + tools.y) + "px";
     // set styles
-    clone.style.color = document.getElementById("color").value;
+    let color = document.getElementById("color").value;
+    clone.style.color = color;
+    clone.style.fill = color;
     clone.classList.remove("ico");
     wrap.classList.add("sel");
     clone.classList.remove("drop-target");
@@ -128,8 +130,9 @@ function resize(element) {
         target.style.width = event.rect.width + "px";
         target.style.height = event.rect.height + "px";
         //font awesome scale
-        let min = Math.min(event.rect.width, event.rect.height);
-        target.style.fontSize = min + "px";
+        let min = Math.max(event.rect.width, event.rect.height);
+        //target.style.fontSize = min + "px";
+        target.setAttribute("data-scale", Math.round(min)/unit);
       }
     },
     modifiers: [
@@ -154,7 +157,7 @@ function resize(element) {
 let labels = document.querySelectorAll("label");
 for (let i = 0; i < labels.length; i++) {
   let label = labels[i];
-  label.addEventListener("click", function (e) {
+  label.addEventListener("pointerdown", function (e) {
     let title = label.classList;
 
     if (title.contains("dir")) {
@@ -173,12 +176,15 @@ for (let i = 0; i < labels.length; i++) {
 
     if (title.contains("fa-expand")) {
       document.getElementById("tools").classList.toggle("zoom");
-    }else if (title.contains("fa-adjust")) {
+    } else if (title.contains("fa-adjust")) {
       document.body.classList.toggle("dark");
+    } else if (title.contains("fa-eraser")) {
+      label.classList.toggle("active");
     }
+    //html2canvas and gifshot makes iffy giffy output 
 
     let el = document.querySelector(".edit");
-    if (el === artboard) {
+    if (el === null || el === artboard) {
       //todo: edits global/local
       return;
     }
@@ -191,7 +197,9 @@ for (let i = 0; i < labels.length; i++) {
         el.parentNode.insertBefore(el.nextElementSibling, el);
       }
     } else if (title.contains("fa-fill")) {
-      el.firstElementChild.style.color = document.getElementById("color").value;
+      let color = document.getElementById("color").value;
+      el.firstElementChild.style.color = color;
+      el.firstElementChild.style.fill = color;
     } else if (title.contains("fa-running")) {
       // animation enabled
       let art = el.firstElementChild;
@@ -255,8 +263,10 @@ document.querySelector("#color").addEventListener("input", function (event) {
     event.target.value + st;
 
   let el = document.querySelector(".edit");
-  if (el != artboard) {
-    el.firstElementChild.style.color = document.getElementById("color").value;
+  if (el != null && el != artboard) {
+    let color = document.getElementById("color").value;
+    el.firstElementChild.style.color = color;
+    el.firstElementChild.style.fill = color;
   }
 });
 
@@ -305,13 +315,15 @@ function raster(el) {
         let w = bound.width / canvas.width;
         let h = bound.height / canvas.height;
 
+        let tool = (document.querySelector("#erase").checked) ? "clearRect" : "fillRect";
         // draw squares
-        ctx.fillRect(
+        ctx[tool](
           event.pageX / w - pixelSize / w / 2,
           event.pageY / h - pixelSize / h / 2,
           pixelSize / w,
           pixelSize / h
         );
+
       }
     }
   });
