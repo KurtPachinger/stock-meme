@@ -1,3 +1,16 @@
+:root {
+  --gray: #dfdfdf;
+  --medium: #8f8f8f;
+  --dark: #6f6f6f;
+}
+
+.dark {
+  --gray: #0f0f0f;
+  --medium: #404040;
+  --dark: #6f6f6f;
+  background-color: #000;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -51,7 +64,7 @@ body .w50 {
 }
 body fieldset {
   font-weight: normal;
-  color: #8f8f8f;
+  color: var(--medium);
   border: none;
   margin-bottom: 0.125rem;
 }
@@ -65,7 +78,7 @@ body fieldset :before {
 }
 body hr {
   border: 0;
-  border-top: 0.125rem solid #8f8f8f;
+  border-top: 0.125rem solid var(--medium);
   margin: 0.25rem auto;
   width: 50%;
   opacity: 0.5;
@@ -84,8 +97,8 @@ body label {
   width: 100%;
   margin-bottom: 0.125rem;
   padding: 0.5rem 0.25rem;
-  background-color: #8f8f8f;
-  color: #dfdfdf;
+  background-color: var(--medium);
+  color: var(--gray);
   white-space: nowrap;
   line-height: 2;
 }
@@ -105,7 +118,7 @@ body button:hover,
 body button:active,
 body label:hover,
 body label:active {
-  background-color: #808080;
+  background-color: var(--dark);
   cursor: pointer;
 }
 body #next {
@@ -118,7 +131,7 @@ body .sel {
   position: absolute;
 }
 body .sel:hover {
-  box-shadow: #dfdfdf -0.25rem -0.25rem 0px 0.25rem inset;
+  box-shadow: var(--gray) -0.25rem -0.25rem 0px 0.25rem inset;
 }
 body .sel:not(:hover):not(.edit) {
   opacity: 0.5;
@@ -207,12 +220,12 @@ body #tools {
   position: absolute;
   z-index: 3;
   width: 128px;
-  background-color: #dfdfdf;
+  background-color: var(--gray);
 }
 body #tools:before {
   text-align: center;
   display: block;
-  color: #8f8f8f;
+  color: var(--medium);
 }
 body #tools .ico:nth-of-type(4n + 1) {
   clear: left;
@@ -232,13 +245,13 @@ body #tools.zoom .ico:nth-of-type(2n + 1) {
 body #tools .drop-target {
   position: relative;
   z-index: 9;
-  background-color: #dfdfdf;
+  background-color: var(--gray);
 }
 body #tools .drop-active {
   box-shadow: rgba(0, 0, 0, 0.5) -0.25rem 0 0 -1px inset;
 }
 body #tools .ico {
-  box-shadow: #dfdfdf 0px 0px 0px 0.25rem inset;
+  box-shadow: var(--gray) 0px 0px 0px 0.25rem inset;
 }
 body #tools .ico {
   opacity: 0.5;
@@ -279,7 +292,7 @@ body #tools #ui {
   left: 100%;
   width: 50%;
   padding: 0.25rem;
-  background-color: #dfdfdf;
+  background-color: var(--gray);
   z-index: 9;
 }
 body #artboard {
@@ -305,8 +318,8 @@ body #artboard .sel .txt {
 }
 [class*=ico]:after {
   font-family: monospace !important;
-  color: #dfdfdf;
-  background: #808080;
+  color: var(--gray);
+  background: var(--dark);
   content: attr(class);
   position: absolute;
   top: 0;

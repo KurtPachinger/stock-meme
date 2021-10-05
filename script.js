@@ -173,6 +173,8 @@ for (let i = 0; i < labels.length; i++) {
 
     if (title.contains("fa-expand")) {
       document.getElementById("tools").classList.toggle("zoom");
+    }else if (title.contains("fa-adjust")) {
+      document.body.classList.toggle("dark");
     }
 
     let el = document.querySelector(".edit");
@@ -260,7 +262,7 @@ document.querySelector("#color").addEventListener("input", function (event) {
 
 function vector(el) {
   el.addEventListener("click", function (event) {
-    console.log(el, event);
+    //console.log(el, event);
 
     let bound = el.getBoundingClientRect();
     let w = bound.width / el.viewBox.baseVal.width;
