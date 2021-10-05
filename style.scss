@@ -1,0 +1,382 @@
+$unit: 32px;
+$gutter: 0.25rem;
+
+// light
+$gray: #dfdfdf;
+$medium: #8f8f8f;
+$on: #6f6f6f;
+$bg: #fff;
+:root {
+  --gray: #{$gray};
+  --medium: #{$medium};
+  --dark: #{$on};
+  --bg: #{$bg};
+}
+// dark
+$d-gray: #0f0f0f;
+$d-medium: #404040;
+$d-on: #6f6f6f;
+$d-bg: #000;
+.dark {
+  --gray: #{$d-gray};
+  --medium: #{$d-medium};
+  --dark: #{$d-on};
+  --bg: #{$d-bg};
+}
+
+// grid
+$dot-size: 2px;
+#artboard {
+  background: linear-gradient(
+        90deg,
+        var(--bg) ($unit - $dot-size),
+        transparent 1%
+      )
+      center,
+    linear-gradient(var(--bg) ($unit - $dot-size), transparent 1%) center,
+    var(--gray);
+  background-size: $unit $unit;
+  background-position: 0 0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+img,
+canvas {
+  //width: 100%;
+  //vertical-align: top;
+}
+svg{width:auto;height:auto;}
+
+.sel .art {
+  padding: $unit;
+  //display: flex;
+}
+.art {
+  width: 100%;
+  height: 100%;
+
+  &:before {
+    position: absolute;
+    font-size: $unit;
+    top: 0;
+    left: 0;
+  }
+  img,
+  canvas,
+  svg {
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIElEQVQYV2Nk+M/QwMDI0MAABYxgGkkQIoAkiBCACgIABm4HhEEa4PgAAAAASUVORK5CYII=");
+  }
+}
+
+svg polygon {
+  stroke: black;
+}
+
+fieldset,
+label > span {
+  font-size: 0.75rem;
+  font-family: sans-serif;
+}
+
+html {
+  font-size: 0.875rem;
+}
+
+body {
+  overflow: hidden;
+
+  .w50 {
+    width: 50%;
+    float: left;
+  }
+
+  fieldset {
+    font-weight: normal;
+    color: var(--medium);
+    border: none;
+    margin-bottom: ($gutter/2);
+    label span {
+      pointer-events: none;
+    }
+    label,
+    :before {
+      line-height: 1;
+      vertical-align: middle;
+    }
+    //margin-bottom: $gutter;
+  }
+  hr {
+    border: 0;
+    border-top: ($gutter/2) solid var(--medium);
+    margin: $gutter auto;
+    width: 50%;
+    opacity: 0.5;
+  }
+  input,
+  button,
+  label {
+    user-select: none;
+    appearance: none;
+    border: none;
+    width: 100%;
+    margin-bottom: ($gutter/2);
+    padding: 0.5rem $gutter;
+    background-color: var(--medium);
+    color: var(--gray);
+    white-space: nowrap;
+    //text-align:center;
+    line-height: 2;
+    input[type="file"],
+    input[type="color"],
+    input[type="checkbox"]{
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      z-index: -9;
+    }
+    &:hover,
+    &:active {
+      background-color: var(--dark);
+      cursor: pointer;
+    }
+  }
+
+  #next {
+    margin: 0 auto;
+  }
+
+  #artboard {
+    &.edit .sel {
+      opacity: 1;
+    }
+  }
+  .sel {
+    position: absolute;
+    &:hover {
+      box-shadow: var(--gray) (-$gutter) (-$gutter) 0px $gutter inset;
+    }
+    &:not(:hover) {
+      &:not(.edit) {
+        opacity: 0.5;
+      }
+    }
+  }
+
+  .ico,
+  .sel {
+    // ux
+    touch-action: none;
+    user-select: none;
+    float: left;
+    text-align: center;
+    // ui
+    width: $unit;
+    height: $unit;
+    font-size: $unit;
+    //color: $medium;
+    background-color: rgba(128, 128, 128, 0.125);
+    border-radius: 0.25rem;
+
+    &:before {
+      z-index: 3;
+      position: relative;
+      width: 200%;
+      display: block;
+      margin-left: -50%;
+    }
+
+    &.txt,
+    .txt {
+      user-select: none;
+
+      //white-space: pre;
+      &.serif {
+        font-family: serif;
+      }
+      &.sans-serif {
+        font-family: sans-serif;
+      }
+      &.monospace {
+        font-family: monospace;
+      }
+      &.cursive {
+        font-family: cursive;
+      }
+      &.fantasy {
+        font-family: fantasy;
+      }
+      &.system-ui {
+        font-family: system-ui;
+      }
+      &.fangsong {
+        font-family: fangsong;
+      }
+      &.emoji {
+        font-family: emoji;
+      }
+
+      //font-size: $unit;
+    }
+    &:hover {
+      //color: $dark;
+    }
+  }
+
+  #tools {
+    &:before {
+      text-align: center;
+      display: block;
+      color: var(--medium);
+    }
+
+    .ico:nth-of-type(4n + 1) {
+      clear: left;
+    }
+
+    &.zoom {
+      width: 64px;
+      #ui label {
+        text-align: center;
+        span {
+          display: none;
+        }
+      }
+      .ico:nth-of-type(2n + 1) {
+        clear: left;
+      }
+    }
+
+    position: absolute;
+    z-index: 3;
+    width: 128px;
+    //height: 100%;
+    background-color: var(--gray);
+    .drop-target {
+      position: relative;
+      z-index: 9;
+      background-color: var(--gray);
+    }
+    .active {
+      box-shadow: rgba(0, 0, 0, 0.5) (-$gutter) 0 0 -1px inset;
+    }
+    .ico {
+      box-shadow: var(--gray) 0px 0px 0px $gutter inset;
+    }
+
+    #camDst .ico {
+      //height: inherit;
+    }
+    .ico {
+      opacity: 0.5;
+      transition: transform 0.125s ease-out;
+
+      canvas,
+      svg {
+        display: none;
+      }
+      &:before,
+      img,
+      p {
+        transform: scale(0.5);
+      }
+      &:hover,
+      &.drop-target {
+        &:before,
+        img,
+        p {
+          transform: scale(1);
+        }
+      }
+      &:hover {
+        opacity: 1;
+        //position: relative;
+        //z-index: 3;
+      }
+    }
+
+    .page {
+      &.current {
+        display: block;
+      }
+      display: none;
+      &[data-title]:before {
+        content: attr(data-title);
+        display: block;
+        padding: $gutter;
+      }
+    }
+    #ui {
+      position: absolute;
+      left: 100%;
+      width: 50%;
+      padding: $gutter;
+      background-color: var(--gray);
+      z-index: 9;
+    }
+  }
+  #artboard {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+
+    &.drop-active {
+      background-color: var(--dark);
+    }
+
+    .sel .txt {
+      text-align: left;
+    }
+  }
+}
+
+[class*="ico"] {
+  //bug: transform clips overflow... terminal-style?
+  position: relative;
+
+  &:after {
+    font-family: monospace !important;
+    color: var(--gray);
+    background: var(--dark);
+    content: attr(class);
+    position: absolute;
+    top: 0;
+    left: 100%;
+    font-size: 1rem;
+    white-space: pre;
+    opacity: 0;
+    z-index: 99;
+    overflow: hidden;
+
+    pointer-events: none;
+  }
+  &:not(.drop-target):hover:after {
+    opacity: 1;
+    //left: 100%;
+    transition: opacity 0.25s linear 0.5s;
+  }
+}
+
+.sel {
+  
+  .fas:before{
+    display:block;
+    transform:scale(1);
+    transition:transform .25s;
+  }
+  
+  @for $i from 1 through 16 {
+    $frc: ($i/2);
+    &[data-scale="#{$frc}"] .fas:not(.art):before{transform:scale($frc)}
+  }
+  
+}
+
