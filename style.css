@@ -1,14 +1,42 @@
+$unit: 32px;
+$gutter: 0.25rem;
+
+// light
+$gray: #dfdfdf;
+$medium: #8f8f8f;
+$on: #6f6f6f;
+$bg: #fff;
 :root {
-  --gray: #dfdfdf;
-  --medium: #8f8f8f;
-  --dark: #6f6f6f;
+  --gray: #{$gray};
+  --medium: #{$medium};
+  --dark: #{$on};
+  --bg: #{$bg};
+}
+// dark
+$d-gray: #0f0f0f;
+$d-medium: #404040;
+$d-on: #6f6f6f;
+$d-bg: #000;
+.dark {
+  --gray: #{$d-gray};
+  --medium: #{$d-medium};
+  --dark: #{$d-on};
+  --bg: #{$d-bg};
 }
 
-.dark {
-  --gray: #0f0f0f;
-  --medium: #404040;
-  --dark: #6f6f6f;
-  background-color: #000;
+// grid
+$dot-size: 2px;
+#artboard {
+  background: linear-gradient(
+        90deg,
+        var(--bg) ($unit - $dot-size),
+        transparent 1%
+      )
+      center,
+    linear-gradient(var(--bg) ($unit - $dot-size), transparent 1%) center,
+    var(--gray);
+  background-size: $unit $unit;
+  background-position: 0 0;
 }
 
 * {
@@ -16,29 +44,34 @@
   padding: 0;
   box-sizing: border-box;
 }
-
-.sel .art {
-  padding: 32px;
-  display: flex;
+img,
+canvas {
+  //width: 100%;
+  //vertical-align: top;
 }
 
+.sel .art {
+  padding: $unit;
+  display: flex;
+}
 .art {
   width: 100%;
   height: 100%;
-}
-.art:before {
-  position: absolute;
-  font-size: 32px;
-  top: 0;
-  left: 0;
-}
-.art img,
-.art canvas,
-.art svg {
-  margin: auto;
-  max-width: 100%;
-  max-height: 100%;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIElEQVQYV2Nk+M/QwMDI0MAABYxgGkkQIoAkiBCACgIABm4HhEEa4PgAAAAASUVORK5CYII=");
+
+  &:before {
+    position: absolute;
+    font-size: $unit;
+    top: 0;
+    left: 0;
+  }
+  img,
+  canvas,
+  svg {
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIElEQVQYV2Nk+M/QwMDI0MAABYxgGkkQIoAkiBCACgIABm4HhEEa4PgAAAAASUVORK5CYII=");
+  }
 }
 
 svg polygon {
@@ -57,281 +90,275 @@ html {
 
 body {
   overflow: hidden;
-}
-body .w50 {
-  width: 50%;
-  float: left;
-}
-body fieldset {
-  font-weight: normal;
-  color: var(--medium);
-  border: none;
-  margin-bottom: 0.125rem;
-}
-body fieldset label span {
-  pointer-events: none;
-}
-body fieldset label,
-body fieldset :before {
-  line-height: 1;
-  vertical-align: middle;
-}
-body hr {
-  border: 0;
-  border-top: 0.125rem solid var(--medium);
-  margin: 0.25rem auto;
-  width: 50%;
-  opacity: 0.5;
-}
-body input,
-body button,
-body label {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  border: none;
-  width: 100%;
-  margin-bottom: 0.125rem;
-  padding: 0.5rem 0.25rem;
-  background-color: var(--medium);
-  color: var(--gray);
-  white-space: nowrap;
-  line-height: 2;
-}
-body input input[type=file],
-body input input[type=color],
-body button input[type=file],
-body button input[type=color],
-body label input[type=file],
-body label input[type=color] {
-  opacity: 0;
-  position: absolute;
-  left: 0;
-  z-index: -9;
-}
-body input:hover, body input:active,
-body button:hover,
-body button:active,
-body label:hover,
-body label:active {
-  background-color: var(--dark);
-  cursor: pointer;
-}
-body #next {
-  margin: 0 auto;
-}
-body #artboard.edit .sel {
-  opacity: 1;
-}
-body .sel {
-  position: absolute;
-}
-body .sel:hover {
-  box-shadow: var(--gray) -0.25rem -0.25rem 0px 0.25rem inset;
-}
-body .sel:not(:hover):not(.edit) {
-  opacity: 0.5;
-}
-body .ico,
-body .sel {
-  touch-action: none;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  float: left;
-  text-align: center;
-  width: 32px;
-  height: 32px;
-  font-size: 32px;
-  background-color: rgba(128, 128, 128, 0.125);
-  border-radius: 0.25rem;
-}
-body .ico:before,
-body .sel:before {
-  z-index: 3;
-  position: relative;
-  width: 200%;
-  display: block;
-  margin-left: -50%;
-}
-body .ico.txt,
-body .ico .txt,
-body .sel.txt,
-body .sel .txt {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-body .ico.txt.serif,
-body .ico .txt.serif,
-body .sel.txt.serif,
-body .sel .txt.serif {
-  font-family: serif;
-}
-body .ico.txt.sans-serif,
-body .ico .txt.sans-serif,
-body .sel.txt.sans-serif,
-body .sel .txt.sans-serif {
-  font-family: sans-serif;
-}
-body .ico.txt.monospace,
-body .ico .txt.monospace,
-body .sel.txt.monospace,
-body .sel .txt.monospace {
-  font-family: monospace;
-}
-body .ico.txt.cursive,
-body .ico .txt.cursive,
-body .sel.txt.cursive,
-body .sel .txt.cursive {
-  font-family: cursive;
-}
-body .ico.txt.fantasy,
-body .ico .txt.fantasy,
-body .sel.txt.fantasy,
-body .sel .txt.fantasy {
-  font-family: fantasy;
-}
-body .ico.txt.system-ui,
-body .ico .txt.system-ui,
-body .sel.txt.system-ui,
-body .sel .txt.system-ui {
-  font-family: system-ui;
-}
-body .ico.txt.fangsong,
-body .ico .txt.fangsong,
-body .sel.txt.fangsong,
-body .sel .txt.fangsong {
-  font-family: fangsong;
-}
-body .ico.txt.emoji,
-body .ico .txt.emoji,
-body .sel.txt.emoji,
-body .sel .txt.emoji {
-  font-family: emoji;
-}
-body #tools {
-  position: absolute;
-  z-index: 3;
-  width: 128px;
-  background-color: var(--gray);
-}
-body #tools:before {
-  text-align: center;
-  display: block;
-  color: var(--medium);
-}
-body #tools .ico:nth-of-type(4n + 1) {
-  clear: left;
-}
-body #tools.zoom {
-  width: 64px;
-}
-body #tools.zoom #ui label {
-  text-align: center;
-}
-body #tools.zoom #ui label span {
-  display: none;
-}
-body #tools.zoom .ico:nth-of-type(2n + 1) {
-  clear: left;
-}
-body #tools .drop-target {
-  position: relative;
-  z-index: 9;
-  background-color: var(--gray);
-}
-body #tools .drop-active {
-  box-shadow: rgba(0, 0, 0, 0.5) -0.25rem 0 0 -1px inset;
-}
-body #tools .ico {
-  box-shadow: var(--gray) 0px 0px 0px 0.25rem inset;
-}
-body #tools .ico {
-  opacity: 0.5;
-  transition: transform 0.125s ease-out;
-}
-body #tools .ico canvas,
-body #tools .ico svg {
-  display: none;
-}
-body #tools .ico:before,
-body #tools .ico img,
-body #tools .ico p {
-  transform: scale(0.5);
-}
-body #tools .ico:hover:before,
-body #tools .ico:hover img,
-body #tools .ico:hover p, body #tools .ico.drop-target:before,
-body #tools .ico.drop-target img,
-body #tools .ico.drop-target p {
-  transform: scale(1);
-}
-body #tools .ico:hover {
-  opacity: 1;
-}
-body #tools .page {
-  display: none;
-}
-body #tools .page.current {
-  display: block;
-}
-body #tools .page[data-title]:before {
-  content: attr(data-title);
-  display: block;
-  padding: 0.25rem;
-}
-body #tools #ui {
-  position: absolute;
-  left: 100%;
-  width: 50%;
-  padding: 0.25rem;
-  background-color: var(--gray);
-  z-index: 9;
-}
-body #artboard {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  box-sizing: border-box;
-  top: 0;
-  -ms-interpolation-mode: nearest-neighbor;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: pixelated;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAABxJREFUKFNjZCASMBKpjmFUId6QIip4Hjx48B8AE0gDqvMYQX4AAAAASUVORK5CYII=);
-}
-body #artboard.drop-active {
-  background-color: rgba(128, 240, 128, 0.125);
-}
-body #artboard .sel .txt {
-  text-align: left;
+
+  .w50 {
+    width: 50%;
+    float: left;
+  }
+
+  fieldset {
+    font-weight: normal;
+    color: var(--medium);
+    border: none;
+    margin-bottom: ($gutter/2);
+    label span {
+      pointer-events: none;
+    }
+    label,
+    :before {
+      line-height: 1;
+      vertical-align: middle;
+    }
+    //margin-bottom: $gutter;
+  }
+  hr {
+    border: 0;
+    border-top: ($gutter/2) solid var(--medium);
+    margin: $gutter auto;
+    width: 50%;
+    opacity: 0.5;
+  }
+  input,
+  button,
+  label {
+    user-select: none;
+    appearance: none;
+    border: none;
+    width: 100%;
+    margin-bottom: ($gutter/2);
+    padding: 0.5rem $gutter;
+    background-color: var(--medium);
+    color: var(--gray);
+    white-space: nowrap;
+    //text-align:center;
+    line-height: 2;
+    input[type="file"],
+    input[type="color"] {
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      z-index: -9;
+    }
+    &:hover,
+    &:active {
+      background-color: var(--dark);
+      cursor: pointer;
+    }
+  }
+
+  #next {
+    margin: 0 auto;
+  }
+
+  #artboard {
+    &.edit .sel {
+      opacity: 1;
+    }
+  }
+  .sel {
+    position: absolute;
+    &:hover {
+      box-shadow: var(--gray) (-$gutter) (-$gutter) 0px $gutter inset;
+    }
+    &:not(:hover) {
+      &:not(.edit) {
+        opacity: 0.5;
+      }
+    }
+  }
+
+  .ico,
+  .sel {
+    // ux
+    touch-action: none;
+    user-select: none;
+    float: left;
+    text-align: center;
+    // ui
+    width: $unit;
+    height: $unit;
+    font-size: $unit;
+    //color: $medium;
+    background-color: rgba(128, 128, 128, 0.125);
+    border-radius: 0.25rem;
+
+    &:before {
+      z-index: 3;
+      position: relative;
+      width: 200%;
+      display: block;
+      margin-left: -50%;
+    }
+
+    &.txt,
+    .txt {
+      user-select: none;
+
+      //white-space: pre;
+      &.serif {
+        font-family: serif;
+      }
+      &.sans-serif {
+        font-family: sans-serif;
+      }
+      &.monospace {
+        font-family: monospace;
+      }
+      &.cursive {
+        font-family: cursive;
+      }
+      &.fantasy {
+        font-family: fantasy;
+      }
+      &.system-ui {
+        font-family: system-ui;
+      }
+      &.fangsong {
+        font-family: fangsong;
+      }
+      &.emoji {
+        font-family: emoji;
+      }
+
+      //font-size: $unit;
+    }
+    &:hover {
+      //color: $dark;
+    }
+  }
+
+  #tools {
+    &:before {
+      text-align: center;
+      display: block;
+      color: var(--medium);
+    }
+
+    .ico:nth-of-type(4n + 1) {
+      clear: left;
+    }
+
+    &.zoom {
+      width: 64px;
+      #ui label {
+        text-align: center;
+        span {
+          display: none;
+        }
+      }
+      .ico:nth-of-type(2n + 1) {
+        clear: left;
+      }
+    }
+
+    position: absolute;
+    z-index: 3;
+    width: 128px;
+    //height: 100%;
+    background-color: var(--gray);
+    .drop-target {
+      position: relative;
+      z-index: 9;
+      background-color: var(--gray);
+    }
+    .drop-active {
+      box-shadow: rgba(0, 0, 0, 0.5) (-$gutter) 0 0 -1px inset;
+    }
+    .ico {
+      box-shadow: var(--gray) 0px 0px 0px $gutter inset;
+    }
+
+    #camDst .ico {
+      //height: inherit;
+    }
+    .ico {
+      opacity: 0.5;
+      transition: transform 0.125s ease-out;
+
+      canvas,
+      svg {
+        display: none;
+      }
+      &:before,
+      img,
+      p {
+        transform: scale(0.5);
+      }
+      &:hover,
+      &.drop-target {
+        &:before,
+        img,
+        p {
+          transform: scale(1);
+        }
+      }
+      &:hover {
+        opacity: 1;
+        //position: relative;
+        //z-index: 3;
+      }
+    }
+
+    .page {
+      &.current {
+        display: block;
+      }
+      display: none;
+      &[data-title]:before {
+        content: attr(data-title);
+        display: block;
+        padding: $gutter;
+      }
+    }
+    #ui {
+      position: absolute;
+      left: 100%;
+      width: 50%;
+      padding: $gutter;
+      background-color: var(--gray);
+      z-index: 9;
+    }
+  }
+  #artboard {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+
+    &.drop-active {
+      background-color: var(--dark);
+    }
+
+    .sel .txt {
+      text-align: left;
+    }
+  }
 }
 
-[class*=ico] {
+[class*="ico"] {
+  //bug: transform clips overflow... terminal-style?
   position: relative;
-}
-[class*=ico]:after {
-  font-family: monospace !important;
-  color: var(--gray);
-  background: var(--dark);
-  content: attr(class);
-  position: absolute;
-  top: 0;
-  left: 100%;
-  font-size: 1rem;
-  white-space: pre;
-  opacity: 0;
-  z-index: 99;
-  overflow: hidden;
-  pointer-events: none;
-}
-[class*=ico]:not(.drop-target):hover:after {
-  opacity: 1;
-  transition: opacity 0.25s linear 0.5s;
+
+  &:after {
+    font-family: monospace !important;
+    color: var(--gray);
+    background: var(--dark);
+    content: attr(class);
+    position: absolute;
+    top: 0;
+    left: 100%;
+    font-size: 1rem;
+    white-space: pre;
+    opacity: 0;
+    z-index: 99;
+    overflow: hidden;
+
+    pointer-events: none;
+  }
+  &:not(.drop-target):hover:after {
+    opacity: 1;
+    //left: 100%;
+    transition: opacity 0.25s linear 0.5s;
+  }
 }
