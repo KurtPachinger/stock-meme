@@ -2,14 +2,16 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - Stock Meme</title>
+  <title>CodePen - Stock Meme with HTTPRELAY</title>
+  <script>let sm;</script>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css'>
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css'><link rel="stylesheet" href="./style.css">
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.6.2/animate.min.css'><link rel="stylesheet" href="./style.css">
 
 </head>
 <body>
 <!-- partial:index.partial.html -->
 <form id="tools" class="fas fa-grip-lines" onSubmit="return false">
+
   <!--modify-->
   <fieldset id="ui">
     <label class="fas fa-expand">
@@ -25,50 +27,53 @@
     <label class="fas fa-layer-group">
       <span>order</span>
     </label>
-    <label class="fas fa-fill">
-      <span>color</span>
-      <input type="color" value="#8f8f8f" id="color" />
-    </label>
     <label class="fas fa-eraser">
       <span>erase</span>
       <input type="checkbox" id="erase" />
     </label>
-    <hr />
+    <label class="fas fa-fill">
+      <span>color</span>
+      <input type="color" value="#8f8f8f" id="color" />
+    </label>
     <label class="fas fa-running">
       <span>motion</span>
     </label>
-    
-    
+    <hr />
+    <label class="fas fa-user-friends">
+      <span>relay</span>
+      <input type="checkbox" id="relay" />
+    </label>
   </fieldset>
+
   <!--create-->
   <fieldset>
     <label class="dir fas fa-font">
       <span>text</span>
     </label>
     <div class="page current" data-title="font">
-      <div class="ico txt serif">
-        <p>A</p>
+      <div class="ico fas fa-font txt serif">
+        <textarea>A</textarea>
       </div>
-      <div class="ico txt sans-serif">
-        <p>A</p>
+      <div class="ico fas fa-font txt sans-serif">
+        <textarea>A</textarea>
       </div>
-      <div class="ico txt monospace">
-        <p>A</p>
+      <div class="ico fas fa-font txt monospace">
+        <textarea>A</textarea>
       </div>
-      <div class="ico txt cursive">
-        <p>A</p>
+      <div class="ico fas fa-font txt cursive">
+        <textarea>A</textarea>
       </div>
-      <div class="ico txt fantasy">
-        <p>A</p>
+      <div class="ico fas fa-font txt fantasy">
+        <textarea>A</textarea>
       </div>
-      <div class="ico txt system-ui">
-        <p>A</p>
+      <div class="ico fas fa-font txt system-ui">
+        <textarea>A</textarea>
       </div>
-      <div class="ico txt fangsong">
-        <p>宋</p>
+      <div class="ico fas fa-font txt fangsong">
+        <textarea>宋</textarea>
       </div>
-      <div class="ico txt emoji">
-        <p>☺️</p>
+      <div class="ico fas fa-font txt emoji">
+        <textarea>☺️</textarea>
       </div>
     </div>
     <div class="page" data-title="bubbles">
@@ -83,7 +88,7 @@
     </div>
   </fieldset>
   <fieldset>
-    <label class="fas fa-camera">
+    <label class="dir fas fa-camera">
       <span>file</span>
       <input type="file" id="camSrc" accept="image/*" multiple />
     </label>
@@ -96,7 +101,7 @@
       </svg>
     </div>
     <div id="camDst">
-      <!--<img class="ico art" />-->
+      <!--<div class="ico art fas fa-file-image"><img /></div>-->
     </div>
   </fieldset>
   <fieldset>
@@ -175,10 +180,9 @@
 
 </form>
 
-<div id="artboard">
+<div id="stage">
   <!--assets cloned here-->
 </div>
-
 <!-- partial -->
   <script type="module" src="./script.js"></script>
 
