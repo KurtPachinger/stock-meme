@@ -262,7 +262,6 @@ sm = {
     canvas: function (el, x, y, col) {
       if (typeof el == "string") {
         el = document.querySelector("#" + el + " canvas");
-        console.log("xhr canvas el: ", el);
         if (!el) {
           return;
         }
@@ -328,7 +327,7 @@ sm = {
         el.firstElementChild.style.color = val;
         el.firstElementChild.style.fill = val;
       } else if (title == "fa-running") {
-        console.log(title, val);
+        //console.log(title, val);
         // animation enabled (3.7.0+ honors "prefers-reduced-motion")
         let art = el.firstElementChild;
         // animation style swap
@@ -356,7 +355,6 @@ sm = {
     },
     label: function (e) {
       if(e.target.nodeName.toLowerCase() != "label"){return;}
-      console.log(e, e.target)
       // UI CLICK HANDLERS
       let label = e.target;
       let title = label.classList;
@@ -409,11 +407,8 @@ sm = {
           // tool methods
           let el = document.querySelector(".edit.sel");
           if (el != null) {
-            // TODO: pass el to switch
             let val = sm.tools.set(el, title);
-            //console.log("val1: ", val)
             sm.mcast.add(el.id, title, { value: val });
-            //console.log("val2: ", val)
           }
         }
       }
@@ -495,17 +490,19 @@ sm = {
     color: function () {
       sm.var.tools
         .querySelector("#color")
-        .addEventListener("change", function (event) {
+        .addEventListener("input", function (event) {
           let st = " -0.25rem 0 0 -1px inset";
           sm.var.tools.querySelector(".fa-fill").style.boxShadow =
             event.target.value + st;
 
-          let el = document.querySelector(".edit");
-          if (el != null && el != sm.var.stage) {
-            let color = document.getElementById("color").value;
-            el.firstElementChild.style.color = color;
-            el.firstElementChild.style.fill = color;
+          let el = document.querySelector(".edit.sel");
+          if (el != null) {
+            let col = event.target.value;
+            el.firstElementChild.style.color = col;
+            el.firstElementChild.style.fill = col;
+            sm.mcast.add(el.id, "fa-fill", { value: col });
           }
+        
         });
     }
   },
