@@ -12,6 +12,7 @@ $bg: #fff;
   --dark: #{$on};
   --bg: #{$bg};
 }
+
 // dark
 $d-gray: #0f0f0f;
 $d-medium: #404040;
@@ -23,6 +24,22 @@ $d-bg: #000;
   --dark: #{$d-on};
   --bg: #{$d-bg};
 }
+
+@media (prefers-color-scheme: dark){
+  body{
+  --gray: #{$d-gray};
+  --medium: #{$d-medium};
+  --dark: #{$d-on};
+  --bg: #{$d-bg};
+    &.adjust{
+    --gray: #{$gray};
+    --medium: #{$medium};
+    --dark: #{$on};
+    --bg: #{$bg};
+    }
+  }
+}
+
 
 * {
   // reset
@@ -168,7 +185,7 @@ html {
         background-color: var(--gray);
       }
       .active {
-        box-shadow: rgba(0, 0, 0, 0.5) (-$gutter) 0 0 -1px inset;
+        box-shadow: var(--dark) (-$gutter) 0 0 -1px inset;
       }
       .ico {
         box-shadow: var(--gray) 0px 0px 0px $gutter inset;
@@ -247,7 +264,7 @@ html {
 
         .art,
         .txt {
-          padding: $unit;
+          padding: 0 0.5rem .25rem 0;
         }
       }
 
@@ -271,6 +288,10 @@ html {
 
       &.art,
       .art {
+        // performant group-draw resolutions
+        content-visibility: auto;
+        contain-intrinsic-size: ($unit*8) ($unit*8);
+        img{width:200%;}
         img,
         canvas,
         svg {
@@ -363,22 +384,27 @@ html {
       top: 0;
 
       .sel {
+        display:table;// flex makes svg (0x0) on v-resize (w>h)
+        >div{display:table-cell;vertical-align:middle}//or table-cell vertical-align
         // scale icon
         .fas:before {
           display: block;
-          transform: scale(1);
+          //transform: scale(1);
           transition: transform 0.25s;
         }
-        @for $i from 1 through 16 {
+        @for $i from 1 through 32 {
           $frc: ($i/2);
           &[data-scale="#{$frc}"] .fas:not(.art):not(.txt):before {
-            transform: scale($frc);
+            font-size: #{$frc +"em"};
           }
         }
       }
 
       .sel .txt {
         text-align: left;
+        display: inline-block;
+        height: inherit;
+        width: 100%;
       }
 
       // ui
