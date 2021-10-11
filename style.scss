@@ -25,21 +25,20 @@ $d-bg: #000;
   --bg: #{$d-bg};
 }
 
-@media (prefers-color-scheme: dark){
-  body{
-  --gray: #{$d-gray};
-  --medium: #{$d-medium};
-  --dark: #{$d-on};
-  --bg: #{$d-bg};
-    &.adjust{
-    --gray: #{$gray};
-    --medium: #{$medium};
-    --dark: #{$on};
-    --bg: #{$bg};
+@media (prefers-color-scheme: dark) {
+  body {
+    --gray: #{$d-gray};
+    --medium: #{$d-medium};
+    --dark: #{$d-on};
+    --bg: #{$d-bg};
+    &.adjust {
+      --gray: #{$gray};
+      --medium: #{$medium};
+      --dark: #{$on};
+      --bg: #{$bg};
     }
   }
 }
-
 
 * {
   // reset
@@ -48,7 +47,8 @@ $d-bg: #000;
   box-sizing: border-box;
 }
 
-html, body{
+html,
+body {
   // js events assume absolute document(0,0) = #stage(0,0)
   width: 100%;
   height: 100%;
@@ -75,6 +75,7 @@ html {
       width: 64px;
       #ui label {
         text-align: center;
+
         span {
           display: none;
         }
@@ -100,41 +101,7 @@ html {
         border: none;
         margin-bottom: ($gutter/2);
 
-        input,
-        button,
-        label {
-          user-select: none;
-          appearance: none;
-          border: none;
-          width: 100%;
-          margin-bottom: ($gutter/2);
-          padding: 0.5rem $gutter;
-          background-color: var(--medium);
-          color: var(--gray);
-          white-space: nowrap;
-
-          // ux
-
-          span {
-            pointer-events: none;
-          }
-          input[type="file"],
-          input[type="color"],
-          input[type="checkbox"] {
-            opacity: 0;
-            position: absolute;
-            left: 0;
-            z-index: -9;
-          }
-
-          &:hover,
-          &:active {
-            background-color: var(--dark);
-            cursor: pointer;
-          }
-        }
-
-        [class*="ico"] {
+        .ico {
           // tooltips
           position: relative;
           &:after {
@@ -155,6 +122,59 @@ html {
           &:not(.drop-target):hover:after {
             opacity: 1;
             transition: opacity 0.25s linear 0.5s;
+          }
+        }
+
+        label {
+          position: relative;
+          input[type="file"],
+          input[type="color"],
+          input[type="checkbox"],
+          input[type="text"] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: -9;
+          }
+          input[type="text"] {
+            &:placeholder {
+              color: var(--gray);
+            }
+          }
+          input[type="checkbox"]:checked + input[type="text"] {
+            opacity: 1;
+            width: ($unit * 4);
+            left: 100%;
+            background: var(--gray);
+            color: var(--dark);
+          }
+        }
+
+        input,
+        button,
+        label {
+          user-select: none;
+          appearance: none;
+          border: none;
+          width: 100%;
+          margin-bottom: ($gutter/2);
+          padding: 0.5rem $gutter;
+          background-color: var(--medium);
+          color: var(--gray);
+          white-space: nowrap;
+
+          // ux
+
+          span {
+            pointer-events: none;
+          }
+
+          &:hover,
+          &:active {
+            background-color: var(--dark);
+            cursor: pointer;
           }
         }
 
@@ -264,7 +284,7 @@ html {
 
         .art,
         .txt {
-          padding: 0 0.5rem .25rem 0;
+          padding: 0 0.5rem 0.25rem 0;
         }
       }
 
@@ -288,10 +308,9 @@ html {
 
       &.art,
       .art {
-        // performant group-draw resolutions
-        content-visibility: auto;
-        contain-intrinsic-size: ($unit*8) ($unit*8);
-        img{width:200%;}
+        img {
+          width: 200%;
+        }
         img,
         canvas,
         svg {
@@ -308,6 +327,11 @@ html {
           polygon {
             stroke: black;
           }
+        }
+        a {
+          width: 100%;
+          height: 100%;
+          display: block;
         }
       }
       .art {
@@ -384,8 +408,16 @@ html {
       top: 0;
 
       .sel {
-        display:table;// flex makes svg (0x0) on v-resize (w>h)
-        >div{display:table-cell;vertical-align:middle}//or table-cell vertical-align
+        .art {
+          // performant group-draw resolutions
+          content-visibility: auto;
+          contain-intrinsic-size: ($unit * 8) ($unit * 8);
+        }
+        display: table; // flex makes svg (0x0) on v-resize (w>h)
+        > div {
+          display: table-cell;
+          vertical-align: middle;
+        } //or table-cell vertical-align
         // scale icon
         .fas:before {
           display: block;
@@ -395,7 +427,7 @@ html {
         @for $i from 1 through 32 {
           $frc: ($i/2);
           &[data-scale="#{$frc}"] .fas:not(.art):not(.txt):before {
-            font-size: #{$frc +"em"};
+            font-size: #{$frc + "em"};
           }
         }
       }
