@@ -2,7 +2,7 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - Stock Meme with HTTPRELAY</title>
+  <title>CodePen - Stock Meme with HTTPRelay</title>
   <script>let sm;</script>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css'>
 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.6.2/animate.min.css'><link rel="stylesheet" href="./style.css">
@@ -92,11 +92,11 @@
       <span>file</span>
       <input type="file" id="camSrc" accept="image/*" multiple />
     </label>
-    <div class="ico art fas fa-edit">
+    <div class="ico fas art fa-edit">
       <canvas width="512" height="512"></canvas>
     </div>
-    <div class="ico art fas fa-draw-polygon">
-      <svg viewBox="0 0 512 512">
+    <div class="ico fas art fa-draw-polygon">
+      <svg width="512" height="512" viewBox="0 0 512 512">
         <polygon points=""></polygon>
       </svg>
     </div>
@@ -184,7 +184,8 @@
   <!--assets cloned here-->
 </div>
 <!-- partial -->
-  <script type="module" src="./script.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js'></script>
+  <script  src="./script.js"></script>
 
 </body>
 </html>
