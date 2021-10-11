@@ -1,13 +1,3 @@
-// PROXY PAGE
-//httprelay.io/features/proxy/
-//codesandbox.io/s/gzwuv ?? PAGE REFRESH
-
-// MCAST PAINT, MESSAGE
-//httprelay.io/features/mcast/
-//jsfiddle.net/jasajona/ky0cLgf9/
-//jsfiddle.net/jasajona/ntwmheaf/
-
-import interact from "//cdn.interactjs.io/v1.10.11/interactjs/index.js";
 sm = {
   var: {
     unit: 64,
@@ -29,7 +19,7 @@ sm = {
     // event listeners
     let labels = sm.var.tools.querySelectorAll("label");
     for (let i = 0; i < labels.length; i++) {
-      labels[i].addEventListener("pointerdown", sm.tools.label);
+      labels[i].addEventListener("pointerup", sm.tools.label);
     }
 
     sm.tools.file();
@@ -101,7 +91,7 @@ sm = {
               ]
             }),
             interact.modifiers.restrictSize({
-              min: { width: sm.var.unit, height: sm.var.unit },
+              min: { width: sm.var.unit / 2, height: sm.var.unit / 2 },
               max: { width: sm.var.unit * 8, height: sm.var.unit * 8 }
             })
           ]
@@ -111,7 +101,7 @@ sm = {
           target.style.width = event.rect.width + "px";
           target.style.height = event.rect.height + "px";
           //font awesome scale
-          let min = Math.max(event.rect.width, event.rect.height);
+          let min = Math.min(event.rect.width, event.rect.height) * 2;
           //target.style.fontSize = min + "px";
           target.setAttribute("data-scale", Math.round(min) / sm.var.unit);
         })
@@ -156,9 +146,6 @@ sm = {
           // event listeners
           sm.interact.drag(wrap);
           sm.interact.resize(wrap);
-          //if (clone.querySelector("p")) {
-          //  clone.setAttribute("contentEditable", true);
-          //}
 
           // drop clone
           wrap.id = sm.mcast.uid + "_" + sm.mcast.id++;
@@ -207,12 +194,12 @@ sm = {
         edit.classList.add("edit");
 
         let name = e.target.nodeName.toLowerCase();
-        // type
-        if (name != "textarea") {
+        if (name == "textarea") {
+          // type
+          sm.stage.type(e);
+        } else {
           // draw
           sm.stage.draw(e);
-        } else {
-          sm.stage.type(e);
         }
       });
     },
@@ -235,6 +222,13 @@ sm = {
       };
     },
     draw: function (e) {
+      if (e instanceof HTMLElement) {
+        // pointerup, pointerleave, DOMNodeRemoved
+        e.removeEventListener("pointermove", sm.stage.draw);
+        e.onpointerup = e.onpointerleave = null;
+        return;
+      }
+
       let el = e.target;
       let x = e.offsetX;
       let y = e.offsetY;
@@ -248,11 +242,10 @@ sm = {
 
         if (name == "canvas") {
           sm.stage.canvas(el, x, y, col);
-          // event handlers
+          // event handlers, should include elements removed?
           el.addEventListener("pointermove", sm.stage.draw);
           el.onpointerup = el.onpointerleave = function () {
-            el.removeEventListener("pointermove", sm.stage.draw);
-            el.onpointerup = el.onpointerleave = null;
+            sm.stage.draw(el);
           };
         } else if (name == "svg") {
           sm.stage.svg(el, x, y, col);
@@ -318,12 +311,17 @@ sm = {
     set: function (el, title, val = null) {
       //console.log(el,title,val)
       if (title == "fa-trash") {
+        let canvas = el.querySelector("canvas");
+        if(canvas){
+         sm.stage.draw(canvas);
+        }
+        
         interact(el).unset();
         el.parentNode.removeChild(el);
         el = null;
       } else if (title == "fa-layer-group") {
-        if (el.nextElementSibling) {
-          el.parentNode.insertBefore(el.nextElementSibling, el);
+        if (el.previousElementSibling) {
+          el.parentNode.insertBefore(el, el.previousElementSibling);
         }
       } else if (title == "fa-fill") {
         val = val ? val : document.getElementById("color").value;
@@ -357,6 +355,8 @@ sm = {
       return val;
     },
     label: function (e) {
+      if(e.target.nodeName.toLowerCase() != "label"){return;}
+      console.log(e, e.target)
       // UI CLICK HANDLERS
       let label = e.target;
       let title = label.classList;
@@ -378,30 +378,33 @@ sm = {
         title = title.value.match(regex)[0];
 
         // tool state
-        if (label.querySelector("input")) {
+       
+        let checkbox = label.querySelector("input[type=checkbox]");
+        if (checkbox && !checkbox.disabled) {
           label.classList.toggle("active");
         }
 
         if (title == "fa-expand" || title == "fa-adjust") {
           // ui theme
           document.body.classList.toggle(title.slice(3));
-        } else if (title == "fa-user-friends" && !sm.mcast.getXhr) {
-          //enable HTTPRELAY
-          //todo: parse receive history
-          console.log("HTTPRelay mcast");
-          let js = document.createElement("script");
-          js.src = "//code.jquery.com/jquery-3.6.0.min.js";
-          js.onload = function () {
-            //$.ajaxSetup({
-            //  xhrFields: {
-            // SeqId (OOO) passed via cookies
-            //    withCredentials: true
-            //  }
-            //});
-            sm.mcast.receive(true);
-            sm.mcast.post();
-          };
-          document.head.appendChild(js);
+        } else if (title == "fa-user-friends") {
+
+          if (label.classList.contains("active")) {
+            console.log("HTTPRelay mcast");
+            if (sm.mcast.getXhr == undefined) {
+              // inject jquery?
+              let js = document.createElement("script");
+              js.src = "//code.jquery.com/jquery-3.6.0.min.js";
+              js.onload = function () {
+                sm.mcast.receive(true);
+                sm.mcast.post();
+              };
+              document.head.appendChild(js);
+              label.querySelector("input[type=checkbox]").disabled = true;
+            }
+          }else{
+            // sm.mcast.getXhr.abort(?)
+          }
         } else {
           // tool methods
           let el = document.querySelector(".edit.sel");
@@ -433,8 +436,8 @@ sm = {
               let img = document.createElement("img");
               div.classList.add(
                 "ico",
-                "art",
                 "fas",
+                "art",
                 "fa-file-image",
                 encodeURI(file.name)
               );
@@ -463,7 +466,7 @@ sm = {
       };
     },
     fileMax: function (img) {
-      var MAX_ = sm.var.unit * 8;
+      var MAX_ = sm.var.unit * 4;
 
       var width = img.width;
       var height = img.height;
@@ -507,9 +510,10 @@ sm = {
     }
   },
   mcast: {
+    //httprelay.io/features/mcast/
     uid: "u" + Date.now(),
     id: 0,
-    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_01",
+    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_cp",
     getXhr: undefined, // global history
     history: { time: 0, events: [] }, // local history
     LZW: {
@@ -559,7 +563,7 @@ sm = {
 
       let entryNew = {
         idx: idx,
-        type: type,
+        type: type
         //time: Date.now(),//events filters?
       };
       for (var key in opts) {
@@ -586,8 +590,10 @@ sm = {
     },
     post: function () {
       setInterval(function () {
+        // opt1: clearInterval if no receive?
+        // opt2: only send if xhr state active
         let history = sm.mcast.history;
-        if (history.events.length) {
+        if (history.events.length && sm.mcast.getXhr) {
           history.uid = sm.mcast.uid;
           history.time = Date.now();
           console.log("post: ", history);
@@ -599,24 +605,32 @@ sm = {
           }); // send sm history
           history.events = [];
         }
+        //fileMAX, LZW.en, and setInterval determine a broken image
       }, 10000);
     },
     receive: function (fromOldest) {
+      //$.ajaxSetup({
+      //  xhrFields: {
+      // SeqId (OOO) passed via cookies
+      //    withCredentials: true
+      //  }
+      //});
       if (sm.mcast.getXhr) sm.mcast.getXhr.abort();
       let url = fromOldest
         ? sm.mcast.mcastUrl + "?SeqId=0&nocache=" + $.now()
         : sm.mcast.mcastUrl;
-      let last = sm.mcast.getXhr ? JSON.parse(sm.mcast.getXhr.responseText) : false;
+      let last = sm.mcast.getXhr
+        ? JSON.parse(sm.mcast.getXhr.responseText)
+        : false;
       sm.mcast.getXhr = $.get(url)
         .done((data) => {
-          
           let history = JSON.parse(data);
           if (history.time == last.time || history.uid == sm.mcast.uid) {
             // abort if stale cookie or same user id
             console.log("expired");
             return;
           }
-        
+
           // event queue
           for (let i = 0; i < history.events.length; i++) {
             let entry = history.events[i];
@@ -677,7 +691,6 @@ sm = {
                 default:
                   console.log("?");
               }
-
             }
           }
         })
