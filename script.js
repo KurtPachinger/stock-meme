@@ -318,7 +318,7 @@ sm = {
         interact(el).unset();
         el.parentNode.removeChild(el);
         el = null;
-      } else if (title == "fa-layer-group") {
+      } else if (title == "fa-sort-amount-down") {
         if (el.previousElementSibling) {
           el.parentNode.insertBefore(el, el.previousElementSibling);
         }
@@ -326,7 +326,7 @@ sm = {
         val = val ? val : document.getElementById("color").value;
         el.firstElementChild.style.color = val;
         el.firstElementChild.style.fill = val;
-      } else if (title == "fa-running") {
+      } else if (title == "fa-video") {
         //console.log(title, val);
         // animation enabled (3.7.0+ honors "prefers-reduced-motion")
         let art = el.firstElementChild;
@@ -349,6 +349,15 @@ sm = {
           art.classList.remove(efx[i]);
         }
         art.classList.add(val);
+      } else if (title == "fa-info-circle") {
+        // title or hyperlink href
+        val = val ? val : document.getElementById("info").value;
+        let media = el.firstElementChild.firstElementChild;
+        if(media && media.nodeName.toLowerCase() == "a"){
+          media.setAttribute("href", val);
+        }
+        el.setAttribute("title", val);
+        
       }
 
       return val;
@@ -385,7 +394,7 @@ sm = {
         if (title == "fa-expand" || title == "fa-adjust") {
           // ui theme
           document.body.classList.toggle(title.slice(3));
-        } else if (title == "fa-user-friends") {
+        } else if (title == "fa-running") {
 
           if (label.classList.contains("active")) {
             console.log("HTTPRelay mcast");
@@ -680,9 +689,10 @@ sm = {
                   break;
                 // io.labels
                 case "fa-trash":
-                case "fa-layer-group":
+                case "fa-sort-amount-down":
+                case "fa-info-circle": //ch
                 case "fa-fill": //ch
-                case "fa-running": //ch
+                case "fa-video": //ch
                   sm.tools.set(el, type, entry.value);
                   break;
                 default:
