@@ -14,37 +14,37 @@
 
   <!--modify-->
   <fieldset id="ui">
-    <label class="fas fa-expand">
+    <label class="fas fa-expand" title="Toggle compact layout.">
       <span>hide</span>
     </label>
-    <label class="fas fa-adjust">
+    <label class="fas fa-adjust" title="Toggle color scheme.">
       <span>dark</span>
     </label>
     <hr />
-    <label class="fas fa-trash">
+    <label class="fas fa-trash" title="Selected item removed from stage.">
       <span>trash</span>
     </label>
-    <label class="fas fa-sort-amount-down">
+    <label class="fas fa-sort-amount-down" title="Selected item moves back one layer.">
       <span>order</span>
     </label>
-    <label class="fas fa-info-circle">
-      <span>info</span>
-      <input type="checkbox" />
-      <input type="text" placeholder="title or link..." id="info" />
-    </label>
-    <label class="fas fa-eraser">
+    <label class="fas fa-eraser" title="Draw on canvas erases pixels.">
       <span>erase</span>
       <input type="checkbox" id="erase" />
     </label>
-    <label class="fas fa-fill">
+    <label class="fas fa-fill" title="Selected item applies value by type.">
       <span>color</span>
       <input type="color" value="#8f8f8f" id="color" />
     </label>
-    <label class="fas fa-video">
+    <label class="fas fa-info-circle" title="Selected item applies value by type. All types set title. Link sets href. Canvas sets onionskin if value begins with period.">
+      <span>meta</span>
+      <input type="checkbox" />
+      <input type="text" placeholder="title, link, or .onion" id="meta" />
+    </label>
+    <label class="fas fa-video" title="A random Animate.css effect is applied.">
       <span>motion</span>
     </label>
     <hr />
-    <label class="fas fa-running">
+    <label class="fas fa-running" title="Stage shared via HTTPRelay mcast.">
       <span>relay</span>
       <input type="checkbox" id="relay" />
     </label>
@@ -52,33 +52,33 @@
 
   <!--create-->
   <fieldset>
-    <label class="dir fas fa-font">
+    <label class="dir fas fa-font" title="Add editable text and speech bubbles.">
       <span>text</span>
     </label>
     <div class="page current" data-title="font">
       <div class="ico fas fa-font txt serif">
-        <textarea>A</textarea>
+        <textarea placeholder="A"></textarea>
       </div>
       <div class="ico fas fa-font txt sans-serif">
-        <textarea>A</textarea>
+        <textarea placeholder="A"></textarea>
       </div>
       <div class="ico fas fa-font txt monospace">
-        <textarea>A</textarea>
+        <textarea placeholder="A"></textarea>
       </div>
       <div class="ico fas fa-font txt cursive">
-        <textarea>A</textarea>
+        <textarea placeholder="A"></textarea>
       </div>
       <div class="ico fas fa-font txt fantasy">
-        <textarea>A</textarea>
+        <textarea placeholder="A"></textarea>
       </div>
       <div class="ico fas fa-font txt system-ui">
-        <textarea>A</textarea>
+        <textarea placeholder="A"></textarea>
       </div>
       <div class="ico fas fa-font txt fangsong">
-        <textarea>宋</textarea>
+        <textarea placeholder="宋"></textarea>
       </div>
       <div class="ico fas fa-font txt emoji">
-        <textarea>☺️</textarea>
+        <textarea placeholder="☺️"></textarea>
       </div>
     </div>
     <div class="page" data-title="bubbles">
@@ -93,7 +93,7 @@
     </div>
   </fieldset>
   <fieldset>
-    <label class="dir fas fa-camera">
+    <label class="dir fas fa-camera" title="Add file, raster, vector, or hyperlink.">
       <span>file</span>
       <input type="file" id="camSrc" accept="image/*" multiple />
     </label>
@@ -106,14 +106,14 @@
       </svg>
     </div>
     <div class="ico fas art fa-link">
-      <a target="_blank"></a>
+      <a target="_blank" href="#"></a>
     </div>
     <div id="camDst">
       <!--<div class="ico art fas fa-file-image"><img /></div>-->
     </div>
   </fieldset>
   <fieldset>
-    <label class="dir fas fa-images">
+    <label class="dir fas fa-images" title="Add stencil from Font Awesome.">
       <span>stencil</span>
     </label>
     <div class="page current" data-title="avatar">
@@ -124,11 +124,11 @@
       <div class="ico fas fa-male"></div>
       <div class="ico fas fa-female"></div>
       <div class="ico fas fa-baby"></div>
+      <div class="ico fas fa-wheelchair"></div>
       <div class="ico fas fa-dog"></div>
       <div class="ico fas fa-cat"></div>
-      <div class="ico fas fa-horse"></div>
       <div class="ico fas fa-crow"></div>
-      <div class="ico fas fa-wheelchair"></div>
+      <div class="ico fas fa-horse"></div>
       <div class="ico fas fa-glasses"></div>
       <div class="ico fas fa-headphones"></div>
       <div class="ico fas fa-crown"></div>
@@ -193,6 +193,7 @@
 <div id="stage">
   <!--assets cloned here-->
 </div>
+
 <!-- partial -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js'></script>
   <script  src="./script.js"></script>
