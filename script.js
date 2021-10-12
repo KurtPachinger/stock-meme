@@ -311,10 +311,10 @@ sm = {
       //console.log(el,title,val)
       if (title == "fa-trash") {
         let canvas = el.querySelector("canvas");
-        if(canvas){
-         sm.stage.draw(canvas);
+        if (canvas) {
+          sm.stage.draw(canvas);
         }
-        
+
         interact(el).unset();
         el.parentNode.removeChild(el);
         el = null;
@@ -332,6 +332,7 @@ sm = {
         let art = el.firstElementChild;
         // animation style swap
         let efx = [
+          "none",
           "bounce",
           "flash",
           "pulse",
@@ -350,20 +351,53 @@ sm = {
         }
         art.classList.add(val);
       } else if (title == "fa-info-circle") {
-        // title or hyperlink href
-        val = val ? val : document.getElementById("info").value;
+        // set title
+        val = val ? val : document.getElementById("meta").value;
+        el.setAttribute("data-meta", val);
+        // set property
         let media = el.firstElementChild.firstElementChild;
-        if(media && media.nodeName.toLowerCase() == "a"){
-          media.setAttribute("href", val);
+        let type = media.nodeName.toLowerCase();
+        if (media) {
+          if (type == "a") {
+            // set hyperlink
+            media.setAttribute("href", val);
+          } else if (type == "canvas") {
+            if (val.charAt(0) == ".") {
+              // set onionskin if prefix match
+
+              let group = sm.var.stage.querySelectorAll(
+                "[data-meta='" + val + "']"
+              );
+              let dur = 0.25;
+              for (let i = 0; i < group.length; i++) {
+                let el = group[i];
+                el.classList.remove("onion");
+                el.style.removeProperty("animation-delay");
+                el.style.removeProperty("animation-duration");
+
+                setTimeout(() => {
+                  // bug with set property timing
+                  el.classList.add("onion");
+                  el.style.setProperty("animation-delay", i * dur + "s");
+                  el.style.setProperty(
+                    "animation-duration",
+                    dur * group.length + "s"
+                  );
+                }, 2000);
+              }
+            } else {
+              el.classList.remove("onion");
+            }
+          }
         }
-        el.setAttribute("title", val);
-        
       }
 
       return val;
     },
     label: function (e) {
-      if(e.target.nodeName.toLowerCase() != "label"){return;}
+      if (e.target.nodeName.toLowerCase() != "label") {
+        return;
+      }
       // UI CLICK HANDLERS
       let label = e.target;
       let title = label.classList;
@@ -385,7 +419,7 @@ sm = {
         title = title.value.match(regex)[0];
 
         // tool state
-       
+
         let checkbox = label.querySelector("input[type=checkbox]");
         if (checkbox && !checkbox.disabled) {
           label.classList.toggle("active");
@@ -395,7 +429,6 @@ sm = {
           // ui theme
           document.body.classList.toggle(title.slice(3));
         } else if (title == "fa-running") {
-
           if (label.classList.contains("active")) {
             console.log("HTTPRelay mcast");
             if (sm.mcast.getXhr == undefined) {
@@ -409,7 +442,7 @@ sm = {
               document.head.appendChild(js);
               label.querySelector("input[type=checkbox]").disabled = true;
             }
-          }else{
+          } else {
             // sm.mcast.getXhr.abort(?)
           }
         } else {
@@ -447,10 +480,18 @@ sm = {
               );
 
               img.onload = function () {
-                let canvas = sm.tools.fileMax(img);
-                let img2 = document.createElement("img");
-                img2.src = canvas.toDataURL(file.type, 0.8);
-                div.appendChild(img2);
+                //console.log(file);
+                if (file.type == "image/gif" && file.size <= 56000) {
+                  // gif under 56kb
+                  div.appendChild(img);
+                } else {
+                  let canvas = sm.tools.fileMax(img);
+                  let imgMax = document.createElement("img");
+                  imgMax.src = canvas.toDataURL(file.type, 0.5);
+                  canvas = null;
+                  div.appendChild(imgMax);
+                }
+
                 dst.appendChild(div);
                 sm.interact.drag(div);
               };
@@ -511,7 +552,6 @@ sm = {
             el.firstElementChild.style.fill = col;
             sm.mcast.add(el.id, "fa-fill", { value: col });
           }
-        
         });
     }
   },
@@ -690,9 +730,9 @@ sm = {
                 // io.labels
                 case "fa-trash":
                 case "fa-sort-amount-down":
-                case "fa-info-circle": //ch
-                case "fa-fill": //ch
-                case "fa-video": //ch
+                case "fa-info-circle":
+                case "fa-fill":
+                case "fa-video":
                   sm.tools.set(el, type, entry.value);
                   break;
                 default:
