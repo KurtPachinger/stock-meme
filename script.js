@@ -22,9 +22,10 @@ sm = {
       labels[i].addEventListener("pointerup", sm.tools.label);
     }
 
-    sm.tools.file();
-    sm.tools.color();
     sm.stage.click();
+    sm.stage.type();
+    sm.tools.color();
+    sm.tools.file();
   },
   interact: {
     drag: function (el) {
@@ -91,7 +92,7 @@ sm = {
               ]
             }),
             interact.modifiers.restrictSize({
-              min: { width: sm.var.unit / 2, height: sm.var.unit / 2 },
+              min: { width: sm.var.unit, height: sm.var.unit },
               max: { width: sm.var.unit * 8, height: sm.var.unit * 8 }
             })
           ]
@@ -101,9 +102,12 @@ sm = {
           target.style.width = event.rect.width + "px";
           target.style.height = event.rect.height + "px";
           //font awesome scale
-          let min = Math.min(event.rect.width, event.rect.height) * 2;
+          let min = Math.min(event.rect.width, event.rect.height);
           //target.style.fontSize = min + "px";
-          target.setAttribute("data-scale", Math.round(min) / sm.var.unit);
+          target.setAttribute(
+            "data-scale",
+            Math.round((min / (sm.var.unit / 2)) * 2) / 2
+          );
         })
         .on("resizeend", function (event) {
           let target = event.target;
@@ -131,6 +135,12 @@ sm = {
           wrap.setAttribute("data-y", rect.y);
           wrap.style =
             "transform:translate(" + rect.x + "px," + rect.y + "px);";
+          wrap.style.width = wrap.style.height = sm.var.unit + "px";
+
+          // original attr reset
+          original.style.cursor = original.style.transform = "";
+          original.removeAttribute("data-x");
+          original.removeAttribute("data-y");
 
           // clone attr
           let clone = original.cloneNode(true);
@@ -139,7 +149,7 @@ sm = {
           clone.removeAttribute("data-x");
           clone.removeAttribute("data-y");
           let color = document.getElementById("color").value;
-          clone.style = "";
+          //clone.style.cursor = clone.style.transform = "";
           clone.style.color = color;
           clone.style.fill = color;
 
@@ -159,19 +169,10 @@ sm = {
             value: en
           });
         })
-        .on("dropactivate", function (event) {
+        .on("dropactivate dropdeactivate", function (event) {
           var ico = event.relatedTarget;
-          ico.classList.add("drop-target");
-          event.target.classList.add("drop-active");
-        })
-        .on("dropdeactivate", function (event) {
-          var ico = event.relatedTarget;
-          ico.classList.remove("drop-target");
-          event.target.classList.remove("drop-active");
-          // reset icon
-          ico.removeAttribute("style");
-          ico.removeAttribute("data-x");
-          ico.removeAttribute("data-y");
+          ico.classList.toggle("drop-target");
+          event.target.classList.toggle("drop-active");
         });
     }
   },
@@ -196,30 +197,90 @@ sm = {
         let name = e.target.nodeName.toLowerCase();
         if (name == "textarea") {
           // type
-          sm.stage.type(e);
         } else {
           // draw
           sm.stage.draw(e);
         }
       });
     },
-    type: function (e) {
-      let el = e.target;
-
-      if (e.type == "keyup") {
+    type: function () {
+      //keydown while drag?
+      document.addEventListener("keyup", function (e) {
+        let el = e.target;
         let name = el.nodeName.toLowerCase();
-        // io.textarea
-        sm.mcast.add(el.closest(".sel").id, name, {
-          value: el.value
-        });
-      }
+        console.log(el, name);
 
-      // event handlers
-      el.addEventListener("keyup", sm.stage.type);
-      el.onblur = function () {
-        el.removeEventListener("keyup", sm.stage.type);
-        el.onblur = null;
-      };
+        if (name == "textarea") {
+          // io.textarea
+          sm.mcast.add(el.closest(".sel").id, name, {
+            value: el.value
+          });
+        } else if (name == "body") {
+          // body
+          el = sm.var.stage.querySelector(".sel.edit");
+          let title, val;
+          if (el) {
+            if (e.key == "Delete" || e.key == "Backspace") {
+              title = "fa-trash-alt";
+            } else if (e.key == "[" || e.key == "]") {
+              title = "fa-sort-amount-down";
+              // directional...?
+            } else if (
+              e.key == "ArrowLeft" ||
+              e.key == "ArrowRight" ||
+              e.key == "ArrowUp" ||
+              e.key == "ArrowDown"
+            ) {
+              title = "dragend";
+              let x = Number(el.getAttribute("data-x"));
+              let y = Number(el.getAttribute("data-y"));
+              let dir = e.key == "ArrowDown" || e.key == "ArrowRight" ? 1 : -1;
+              dir *= sm.var.unit;
+              if (e.key == "ArrowLeft" || e.key == "ArrowRight") {
+                x += dir;
+              } else {
+                y += dir;
+              }
+              val = {
+                x: x,
+                y: y
+              };
+            } else if (e.key == "+" || e.key == "-") {
+              title = "resizeend";
+              let zoom = e.key == "+" ? 1 : -1;
+              zoom *= sm.var.unit;
+              let width = el.offsetWidth + zoom;
+              let height = el.offsetHeight + zoom;
+
+              let scale = Math.min(
+                width - (width % sm.var.unit),
+                height - (height % sm.var.unit)
+              );
+              //let scale = Math.round(min)/sm.var.unit;
+              val = {
+                width: width + "px",
+                height: height + "px",
+                scale: Math.round(scale * 2) / 2
+              };
+              console.log(val);
+            } else if (e.key == "Tab") {
+              //  e.preventDefault();
+              //  el = sm.var.stage.querySelector(".edit");
+              //  //TEST
+              //  let dir = (el && el.nextElementSibling) || sm.var.stage.querySelector(".sel") ;
+              //  if (dir) {
+              //    el && el.classList.remove("edit");
+              //    dir.classList.add("edit");
+              //  }
+            }
+
+            if (title) {
+              sm.tools.set(el, title, val);
+              sm.mcast.add(el.id, title, val);
+            }
+          }
+        }
+      });
     },
     draw: function (e) {
       if (e instanceof HTMLElement) {
@@ -307,89 +368,97 @@ sm = {
     }
   },
   tools: {
-    set: function (el, title, val = null) {
+    set: function (el, title, val) {
+      console.log(el, title, val);
       //console.log(el,title,val)
-      if (title == "fa-trash") {
-        let canvas = el.querySelector("canvas");
-        if (canvas) {
-          sm.stage.draw(canvas);
-        }
+      switch (title) {
+        // io or keyboard
+        case "drop":
+          break;
+        case "resizeend":
+          el.style.width = val.width;
+          el.style.height = val.height;
+          el.setAttribute("data-scale", val.scale);
+          break;
+        case "dragend":
+          el.setAttribute("data-x", val.x);
+          el.setAttribute("data-y", val.y);
+          el.style.transform = "translate(" + val.x + "px, " + val.y + "px)";
+          break;
+        case "fa-trash-alt":
+          let canvas = el.querySelector("canvas");
+          if (canvas) {
+            sm.stage.draw(canvas);
+          }
 
-        interact(el).unset();
-        el.parentNode.removeChild(el);
-        el = null;
-      } else if (title == "fa-sort-amount-down") {
-        if (el.previousElementSibling) {
-          el.parentNode.insertBefore(el, el.previousElementSibling);
-        }
-      } else if (title == "fa-fill") {
-        val = val ? val : document.getElementById("color").value;
-        el.firstElementChild.style.color = val;
-        el.firstElementChild.style.fill = val;
-      } else if (title == "fa-video") {
-        //console.log(title, val);
-        // animation enabled (3.7.0+ honors "prefers-reduced-motion")
-        let art = el.firstElementChild;
-        // animation style swap
-        let efx = [
-          "none",
-          "bounce",
-          "flash",
-          "pulse",
-          "rubberBand",
-          "headShake",
-          "swing",
-          "tada",
-          "shake",
-          "wobble",
-          "jello",
-          "flip"
-        ];
-        val = val ? val : efx[Math.floor(Math.random() * efx.length)];
-        for (let i = 0; i < efx.length; i++) {
-          art.classList.remove(efx[i]);
-        }
-        art.classList.add(val);
-      } else if (title == "fa-info-circle") {
-        // set title
-        val = val ? val : document.getElementById("meta").value;
-        el.setAttribute("data-meta", val);
-        // set property
-        let media = el.firstElementChild.firstElementChild;
-        let type = media.nodeName.toLowerCase();
-        if (media) {
-          if (type == "a") {
-            // set hyperlink
-            media.setAttribute("href", val);
-          } else if (type == "canvas") {
-            if (val.charAt(0) == ".") {
-              // set onionskin if prefix match
+          interact(el).unset();
+          el.parentNode.removeChild(el);
+          el = null;
+          break;
+        case "fa-sort-amount-down":
+          if (el.previousElementSibling) {
+            el.parentNode.insertBefore(el, el.previousElementSibling);
+          }
+          break;
+        case "fa-fill":
+          val = val ? val.value : document.getElementById("color").value;
+          el.firstElementChild.style.color = val;
+          el.firstElementChild.style.fill = val;
+          break;
+        case "fa-play-circle":
+          // animate.css 3.7.0+ honors "prefers-reduced-motion"
+          let art = el.firstElementChild;
+          let animate = document.getElementById("animate");
 
-              let group = sm.var.stage.querySelectorAll(
-                "[data-meta='" + val + "']"
-              );
-              let dur = 0.25;
-              for (let i = 0; i < group.length; i++) {
-                let el = group[i];
-                el.classList.remove("onion");
-                el.style.removeProperty("animation-delay");
-                el.style.removeProperty("animation-duration");
-
-                setTimeout(() => {
-                  // bug with set property timing
-                  el.classList.add("onion");
-                  el.style.setProperty("animation-delay", i * dur + "s");
-                  el.style.setProperty(
-                    "animation-duration",
-                    dur * group.length + "s"
-                  );
-                }, 2000);
-              }
+          val = val ? val.value : animate.selectedOptions[0].value;
+          for (let i = 0; i < animate.length; i++) {
+            art.classList.remove(animate.options[i].value);
+          }
+          art.classList.add(val);
+          break;
+        case "fa-asterisk":
+          // set title
+          val = val ? val.value : document.getElementById("meta").value;
+          el.setAttribute("data-meta", val);
+          // set property
+          let media =
+            el.firstElementChild.firstElementChild || el.firstElementChild;
+          let type = media.nodeName.toLowerCase();
+          if (media) {
+            if (type == "a") {
+              // set hyperlink
+              media.setAttribute("href", val);
             } else {
-              el.classList.remove("onion");
+              if (val.charAt(0) == ".") {
+                // set onionskin if prefix match
+
+                let group = sm.var.stage.querySelectorAll(
+                  "[data-meta='" + val + "']"
+                );
+                let dur = 0.25;
+                for (let i = 0; i < group.length; i++) {
+                  let el = group[i];
+                  el.classList.remove("onion");
+                  el.style.removeProperty("animation-delay");
+                  el.style.removeProperty("animation-duration");
+
+                  setTimeout(() => {
+                    // bug with set property timing
+                    el.classList.add("onion");
+                    el.style.setProperty("animation-delay", i * dur + "s");
+                    el.style.setProperty(
+                      "animation-duration",
+                      dur * group.length + "s"
+                    );
+                  }, 2000);
+                }
+              } else {
+                el.classList.remove("onion");
+              }
             }
           }
-        }
+          break;
+        default:
       }
 
       return val;
@@ -415,8 +484,8 @@ sm = {
         pageCurr && pageCurr.classList.remove("current");
         pageNext && pageNext.classList.add("current");
       } else {
-        const regex = /(fa)(-[a-z]+)+/g;
-        title = title.value.match(regex)[0];
+        const fa = /(fa)(-[a-z]+)+/g;
+        title = title.value.match(fa)[0];
 
         // tool state
 
@@ -428,6 +497,8 @@ sm = {
         if (title == "fa-expand" || title == "fa-adjust") {
           // ui theme
           document.body.classList.toggle(title.slice(3));
+        } else if (title == "fa-film") {
+          sm.tools.render(sm.var.tools.querySelector("#frames"));
         } else if (title == "fa-running") {
           if (label.classList.contains("active")) {
             console.log("HTTPRelay mcast");
@@ -450,63 +521,71 @@ sm = {
           let el = document.querySelector(".edit.sel");
           if (el != null) {
             let val = sm.tools.set(el, title);
-            sm.mcast.add(el.id, title, { value: val });
+            val = val ? { value: val } : {};
+            sm.mcast.add(el.id, title, val);
           }
         }
       }
     },
     file: function () {
-      document.getElementById("camSrc").onchange = function (evt) {
+      document.getElementById("img").onchange = document.getElementById(
+        "txt"
+      ).onchange = function (evt) {
         //stackoverflow.com/questions/3814231/
         var tgt = evt.target || window.event.srcElement,
           files = tgt.files;
 
         // FileReader support
         if (FileReader && files && files.length) {
-          let dst = document.getElementById("camDst");
+          let dst = document.getElementById(tgt.id + "Dst");
           dst.innerHTML = "";
           for (let i = 0; i < files.length; i++) {
             let file = files[i];
             let fr = new FileReader();
             fr.onload = function () {
               let div = document.createElement("div");
-              let img = document.createElement("img");
-              div.classList.add(
-                "ico",
-                "fas",
-                "art",
-                "fa-file-image",
-                encodeURI(file.name)
-              );
+              div.classList.add("ico", "fas", encodeURI(file.name));
+              if (tgt.id == "txt") {
+                // type text
+                let txt = document.createElement("textarea");
+                div.classList.add("txt", "fa-font");
+                div.appendChild(txt);
+                txt.value = fr.result;
+              } else {
+                // type image
 
-              img.onload = function () {
-                //console.log(file);
-                if (file.type == "image/gif" && file.size <= 56000) {
-                  // gif under 56kb
-                  div.appendChild(img);
-                } else {
-                  let canvas = sm.tools.fileMax(img);
-                  let imgMax = document.createElement("img");
-                  imgMax.src = canvas.toDataURL(file.type, 0.5);
-                  canvas = null;
-                  div.appendChild(imgMax);
-                }
+                let img = document.createElement("img");
+                div.classList.add("art", "fa-image");
 
-                dst.appendChild(div);
-                sm.interact.drag(div);
-              };
+                img.onload = function () {
+                  //console.log(file);
+                  if (file.type == "image/gif" && file.size <= 56000) {
+                    // gif under 56kb
+                    //div.appendChild(img);
+                    div.style.backgroundImage = "url(" + img.src + ")";
+                  } else {
+                    let canvas = sm.tools.fileMax(img);
+                    let imgMax = document.createElement("img");
+                    imgMax.src = canvas.toDataURL(file.type, 0.5);
+                    canvas = null;
+                    //div.appendChild(imgMax);
+                    div.style.backgroundImage = "url(" + imgMax.src + ")";
+                  }
+                };
 
-              img.src = fr.result;
+                img.src = fr.result;
+              }
+              dst.appendChild(div);
+              sm.interact.drag(div);
             };
 
-            fr.readAsDataURL(file);
+            // file read as text or image
+            if (tgt.id == "txt") {
+              fr.readAsText(file);
+            } else {
+              fr.readAsDataURL(file);
+            }
           }
-        }
-
-        // Not supported
-        else {
-          // fallback -- perhaps submit the input to an iframe and temporarily store
-          // them on the server until the user's session ends.
         }
       };
     },
@@ -553,13 +632,83 @@ sm = {
             sm.mcast.add(el.id, "fa-fill", { value: col });
           }
         });
+    },
+    render: function (output) {
+      // link crossorigin rel=stylesheet
+      output.innerHTML = "";
+
+      // reduce filesize
+      let sz = sm.var.stage.getBoundingClientRect();
+      let w = sz.width / 2;
+      let h = sz.height / 2;
+      // time progress
+      let prog = {
+        total: 1000,
+        step: 250
+      };
+      prog.load = prog.queue = prog.total / prog.step;
+
+      let duration = setInterval(function () {
+        // frame every 0.2 seconds for 1 second
+        let frames = output.getElementsByTagName("img");
+        console.log(frames, prog);
+
+        if (prog.queue > 0) {
+          prog.queue--;
+          domtoimage
+            .toJpeg(sm.var.stage, { quality: 0.5 })
+            .then(function (dataUrl) {
+              var img = new Image();
+              img.onload = function () {
+                prog.load--;
+              };
+              img.src = dataUrl;
+              output.appendChild(img);
+            })
+            .catch(function (error) {
+              console.error("error", error);
+            });
+        } else if (prog.load === 0) {
+          clearInterval(duration);
+          composite(frames);
+        }
+      }, prog.step);
+
+      function composite(frames) {
+        console.log("composite", frames);
+        gifshot.createGIF(
+          {
+            images: Array.from(frames),
+            gifWidth: w,
+            gifHeight: h,
+            // The amount of time (10 = 1s) to stay on each frame
+            frameDuration: prog.step / 10,
+            sampleInterval: 20
+          },
+          function (obj) {
+            console.log(obj);
+            if (!obj.error) {
+              output.innerHTML = "";
+
+              let base64 = obj.image,
+                link = document.createElement("a"),
+                gif = document.createElement("img");
+              gif.src = link.href = base64;
+              link.append(gif);
+              link.download = "render.gif";
+              link.target = "_blank";
+              output.appendChild(link);
+            }
+          }
+        );
+      }
     }
   },
   mcast: {
     //httprelay.io/features/mcast/
     uid: "u" + Date.now(),
     id: 0,
-    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_cp",
+    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_cp1",
     getXhr: undefined, // global history
     history: { time: 0, events: [] }, // local history
     LZW: {
@@ -603,7 +752,8 @@ sm = {
       }
     },
     add: function (idx, type, opts = {}) {
-      if (!idx) {
+      //console.log(idx,type,opts)
+      if (!idx || !type) {
         return;
       }
 
@@ -625,7 +775,7 @@ sm = {
             entryOld.type == entryNew.type &&
             entryOld.type != "canvas" &&
             entryOld.type != "svg";
-          if (stale || entryNew.type == "fa-trash") {
+          if (stale || entryNew.type == "fa-trash-alt") {
             entryOld = null;
             events.splice(i, 1);
           }
@@ -680,7 +830,6 @@ sm = {
           // event queue
           for (let i = 0; i < history.events.length; i++) {
             let entry = history.events[i];
-            let id = entry.idx.slice(0, entry.idx.indexOf("_"));
             console.log("entry", i, entry);
 
             //idx, type, value, etc.
@@ -699,20 +848,6 @@ sm = {
               sm.var.stage.appendChild(sel);
             } else if (el != null) {
               switch (type) {
-                // io.interact
-                case "drop":
-                  break;
-                case "resizeend":
-                  el.style.width = entry.width;
-                  el.style.height = entry.height;
-                  el.setAttribute("data-scale", entry.scale);
-                  break;
-                case "dragend":
-                  el.setAttribute("data-x", entry.x);
-                  el.setAttribute("data-y", entry.y);
-                  el.style.transform =
-                    "translate(" + entry.x + "px, " + entry.y + "px)";
-                  break;
                 // io.edit
                 case "canvas":
                   el = el.querySelector("canvas");
@@ -725,18 +860,10 @@ sm = {
                 case "textarea":
                   el = el.querySelector("textarea");
                   el.value = entry.value;
-                  //sm.stage.type(el);
                   break;
                 // io.labels
-                case "fa-trash":
-                case "fa-sort-amount-down":
-                case "fa-info-circle":
-                case "fa-fill":
-                case "fa-video":
-                  sm.tools.set(el, type, entry.value);
-                  break;
                 default:
-                  console.log("?");
+                  sm.tools.set(el, type, entry);
               }
             }
           }
