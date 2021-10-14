@@ -59,7 +59,8 @@ html {
   fieldset,
   label > span {
     font-size: 0.75rem;
-    font-family: sans-serif;
+    font-family: system-ui, Helvetica, Arial, sans-serif;
+    font-weight: normal;
   }
 
   body {
@@ -132,10 +133,9 @@ html {
 
         label {
           position: relative;
-          input[type="file"],
-          input[type="color"],
-          input[type="checkbox"],
-          input[type="text"] {
+          input,select {
+            appearance: none;
+            border-radius:0;
             opacity: 0;
             position: absolute;
             top: 0;
@@ -144,16 +144,19 @@ html {
             z-index: -9;
           }
           input[type="text"] {
+            user-select:all;
             &:placeholder {
               color: var(--gray);
             }
           }
-          input[type="checkbox"]:checked + input[type="text"] {
+          input[type="checkbox"]:checked {
+            & + input, & + select{
             opacity: 1;
             width: ($unit * 4);
             left: 100%;
             background: var(--gray);
             color: var(--dark);
+            }
           }
         }
 
@@ -194,7 +197,7 @@ html {
 
       canvas,
       svg,
-      .ico.fa-file-image:before {
+      .ico.fa-image:before {
         display: none;
       }
 
@@ -306,7 +309,7 @@ html {
 
         .art,
         .txt {
-          padding: 0 0.5rem 0.25rem 0;
+          //padding: 0 0.5rem 0.25rem 0;
         }
       }
 
@@ -330,8 +333,14 @@ html {
 
       &.art,
       .art {
+        &.fa-image{
+          background-repeat: no-repeat;
+          background-position: 50% 50%;
+          background-size: cover;
+        }
         img {
-          width: 200%;
+          //width: 200%;
+          display:none;
         }
         img,
         canvas,
@@ -427,9 +436,8 @@ html {
       position: absolute;
       top: 0;
 
-      
-      
       .sel {
+        padding:0 0.5rem 0.5rem 0;
         z-index:1;
         &:hover{z-index:1;}
         &.edit{z-index:2;}
@@ -447,7 +455,6 @@ html {
         // scale icon
         .fas:before {
           display: block;
-          //transform: scale(1);
           transition: transform 0.25s;
         }
         @for $i from 1 through 32 {
@@ -489,6 +496,10 @@ html {
       background-size: $unit $unit;
       background-position: 0 0;
     }
+  }
+  
+  #frames{
+    img{ width:100%; }
   }
 
   * {
