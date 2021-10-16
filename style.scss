@@ -71,35 +71,34 @@ html {
       width: 50%;
       float: left;
     }
-    
-    
-    .ico, .sel {
-          // tooltips
-          position: relative;
-          &.sel:after{
-            content: attr(data-meta);
-          }
-          &:after {
-            pointer-events: none;
-            font-family: monospace !important;
-            color: var(--gray);
-            background: var(--dark);
-            content: attr(class);
-            position: absolute;
-            top: 0;
-            left: 100%;
-            font-size: 1rem;
-            white-space: pre;
-            opacity: 0;
-            z-index: 99;
-            overflow: hidden;
-          }
-          &:not(.drop-target):hover:after {
-            opacity: 1;
-            transition: opacity 0.25s linear 0.5s;
-          }
-        }
-    
+
+    .ico,
+    .sel {
+      // tooltips
+      position: relative;
+      &.sel:after {
+        content: attr(data-meta);
+      }
+      &:after {
+        pointer-events: none;
+        font-family: monospace !important;
+        color: var(--gray);
+        background: var(--dark);
+        content: attr(class);
+        position: absolute;
+        top: 0;
+        left: 100%;
+        font-size: 1rem;
+        white-space: pre;
+        opacity: 0;
+        z-index: 99;
+        overflow: hidden;
+      }
+      &:not(.drop-target):hover:after {
+        opacity: 1;
+        transition: opacity 0.25s linear 0.5s;
+      }
+    }
 
     &.expand #tools {
       width: 64px;
@@ -133,9 +132,10 @@ html {
 
         label {
           position: relative;
-          input,select {
+          input,
+          select {
             appearance: none;
-            border-radius:0;
+            border-radius: 0;
             opacity: 0;
             position: absolute;
             top: 0;
@@ -144,18 +144,19 @@ html {
             z-index: -9;
           }
           input[type="text"] {
-            user-select:all;
+            user-select: all;
             &:placeholder {
               color: var(--gray);
             }
           }
           input[type="checkbox"]:checked {
-            & + input, & + select{
-            opacity: 1;
-            width: ($unit * 4);
-            left: 100%;
-            background: var(--gray);
-            color: var(--dark);
+            & + input,
+            & + select {
+              opacity: 1;
+              width: ($unit * 4);
+              left: 100%;
+              background: var(--gray);
+              color: var(--dark);
             }
           }
         }
@@ -197,7 +198,8 @@ html {
 
       canvas,
       svg,
-      .ico.fa-image:before {
+      .ico.fa-image:before,
+      .ico.fa-link iframe {
         display: none;
       }
 
@@ -279,26 +281,50 @@ html {
       border-radius: 0.25rem;
 
       &.sel {
-        textarea{
+        textarea {
           text-indent: 1em;
         }
-        &.onion{
+        &.onion {
           opacity: 0;
           animation: 1s infinite onion;
         }
-        @keyframes onion{
-          0%,90%{opacity: 0;}
-          95%{opacity: 1;}
-          100%{opacity: 0;}
+        @keyframes onion {
+          0%,
+          70% {
+            opacity: 0;
+          }
+          80%, 90% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+          }
         }
-        
+
         // stage
         position: absolute;
-        &:hover,&.edit {
+        &:hover,
+        &.edit {
           box-shadow: var(--medium) (-$gutter) (-$gutter) 0px $gutter inset;
-          canvas,svg{
-            background: repeating-conic-gradient(rgba(128,128,128,0.05) 
-              0% 25%, transparent 0% 50%) 50% / 1em 1em;
+          canvas,
+          svg {
+            background: repeating-conic-gradient(
+                rgba(128, 128, 128, 0.05) 0% 25%,
+                transparent 0% 50%
+              )
+              50% / 1em 1em;
+            path:last-child {
+              stroke: var(--dark);
+              stroke-width: $gutter;
+              stroke-dasharray: ($unit/2) ($unit/2);
+              stroke-dashoffset: 0%;
+              animation: 30s infinite linear marquee;
+            }
+            @keyframes marquee {
+              to {
+                stroke-dashoffset: 100%;
+              }
+            }
           }
         }
         &:not(:hover) {
@@ -329,18 +355,19 @@ html {
         font-size: $unit;
         top: 0;
         left: 0;
+        z-index: 1;
       }
 
       &.art,
       .art {
-        &.fa-image{
+        &.fa-image {
           background-repeat: no-repeat;
           background-position: 50% 50%;
           background-size: cover;
         }
         img {
           //width: 200%;
-          display:none;
+          display: none;
         }
         img,
         canvas,
@@ -354,9 +381,25 @@ html {
           // responsive
           width: auto;
           height: auto;
-          polygon {
-            stroke: black;
+        }
+
+        .fa-link {
+          overflow: hidden;
+          position: relative;
+          width: 100%;
+          &:after {
+            padding-top: 56.25%;
+            display: block;
+            content: "";
           }
+        }
+
+        iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
         }
         a {
           width: 100%;
@@ -437,11 +480,15 @@ html {
       top: 0;
 
       .sel {
-        padding:0 0.5rem 0.5rem 0;
-        z-index:1;
-        &:hover{z-index:1;}
-        &.edit{z-index:2;}
-        
+        padding: 0 0.5rem 0.5rem 0;
+        z-index: 1;
+        &:hover {
+          z-index: 1;
+        }
+        &.edit {
+          z-index: 2;
+        }
+
         .art {
           // performant group-draw resolutions
           content-visibility: auto;
@@ -497,9 +544,11 @@ html {
       background-position: 0 0;
     }
   }
-  
-  #frames{
-    img{ width:100%; }
+
+  #frames {
+    img {
+      width: 100%;
+    }
   }
 
   * {
