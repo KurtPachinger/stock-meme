@@ -180,6 +180,11 @@ sm = {
   stage: {
     click: function () {
       sm.var.stage.addEventListener("pointerdown", function (e) {
+        let name = e.target.nodeName.toLowerCase();
+        if (name == "canvas" || name == "svg" || name == "path") {
+          sm.stage.draw(e);
+        }
+
         // set edit state
         let edits = document.querySelectorAll(".edit");
         for (let i = 0; i < edits.length; i++) {
@@ -193,14 +198,6 @@ sm = {
           }
         }
         edit.classList.add("edit");
-
-        let name = e.target.nodeName.toLowerCase();
-        if (name == "textarea") {
-          // type
-        } else {
-          // draw
-          sm.stage.draw(e);
-        }
       });
     },
     type: function () {
@@ -283,6 +280,7 @@ sm = {
       });
     },
     draw: function (e) {
+      console.log("draw", e);
       if (e instanceof HTMLElement) {
         // pointerup, pointerleave, DOMNodeRemoved
         e.removeEventListener("pointermove", sm.stage.draw);
@@ -301,6 +299,7 @@ sm = {
           ? "transparent"
           : document.getElementById("color").value;
 
+        let edit = el.closest(".sel").classList.contains("edit");
         if (name == "canvas") {
           sm.stage.canvas(el, x, y, col);
           // event handlers, should include elements removed?
@@ -308,15 +307,16 @@ sm = {
           el.onpointerup = el.onpointerleave = function () {
             sm.stage.draw(el);
           };
-        } else if (name == "svg") {
-          sm.stage.svg(el, x, y, col);
+        } else if (name == "svg" || name == "path") {
+          sm.stage.svg(el.closest("svg"), x, y, col, edit);
         }
 
         // io.canvas/svg
         sm.mcast.add(el.closest(".sel").id, name, {
           x: x,
           y: y,
-          col: col
+          col: col,
+          edit: edit
         });
       }
     },
@@ -346,7 +346,10 @@ sm = {
         pixelSize / h
       );
     },
-    svg: function (el, x, y, col) {
+    svg: function (el, x, y, col, edit) {
+      console.log("svg", el, x, y, col, edit);
+      //codepen.io/GreenSock/pen/wvgGxEr
+      //codepen.io/GreenSock/pen/8fcb337385d0f1e401a66f260cf73e76
       if (typeof el == "string") {
         el = document.querySelector("#" + el + " svg");
         if (!el) {
@@ -355,24 +358,41 @@ sm = {
       }
 
       // size native
-      let bound = el.getBoundingClientRect();
-      let w = bound.width / el.viewBox.baseVal.width;
-      let h = bound.height / el.viewBox.baseVal.height;
-      // draw responsive
-      var point = el.createSVGPoint();
+      let svg = el.closest("svg");
+      let bound = svg.getBoundingClientRect();
+      let w = bound.width / svg.viewBox.baseVal.width;
+      let h = bound.height / svg.viewBox.baseVal.height;
+      // add point responsive
+      var point = svg.createSVGPoint();
       point.x = x / w;
       point.y = y / h;
-      // add point
-      let polygon = el.children[0];
-      polygon.points.appendItem(point);
+
+      // path or new
+      let path = svg.querySelector("path:last-child");
+      //editing = editing ? editing : svg.closest(".sel").classList.contains("edit");
+      if (!path || !edit) {
+        // if no path or regain focus & not click old path
+        path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", " ");
+        path.style.fill = col;
+        svg.appendChild(path);
+      }
+
+      let d = path.getAttribute("d");
+      d = d.replace("M", "").replace("Z", "");
+      path.setAttribute("d", "M" + d + " " + point.x + "," + point.y + "Z");
     }
   },
   tools: {
-    set: function (el, title, val) {
-      console.log(el, title, val);
-      //console.log(el,title,val)
-      switch (title) {
-        // io or keyboard
+    set: function (el, event, val) {
+      console.log(el, event, val);
+
+      let media = el.firstElementChild;
+      const fa = /(fa)(-[a-z]+)+/g;
+      let title = media.className.match(fa)[0];
+
+      switch (event) {
+        // remote/local event val ? provided : retrieved
         case "drop":
           break;
         case "resizeend":
@@ -390,7 +410,6 @@ sm = {
           if (canvas) {
             sm.stage.draw(canvas);
           }
-
           interact(el).unset();
           el.parentNode.removeChild(el);
           el = null;
@@ -400,61 +419,77 @@ sm = {
             el.parentNode.insertBefore(el, el.previousElementSibling);
           }
           break;
+        case "fa-eraser":
+          if (title == "fa-draw-polygon") {
+            let path = media.querySelector("svg path:last-child");
+            if (path) {
+              let points = path.getAttribute("d");
+              points = points.slice(0, points.lastIndexOf(" ")) + "Z";
+              points = points.indexOf(",") > -1 ? points : false;
+              if (!points) {
+                path.parentNode.removeChild(path);
+              } else {
+                path.setAttribute("d", points);
+              }
+              val = val ? val.value : "path";
+            }
+          }
+          break;
         case "fa-fill":
           val = val ? val.value : document.getElementById("color").value;
-          el.firstElementChild.style.color = val;
-          el.firstElementChild.style.fill = val;
+          media.style.color = val;
+          if (title == "fa-draw-polygon") {
+            media = media.querySelector("svg path:last-child");
+            media && (media.style.fill = val);
+          }
           break;
         case "fa-play-circle":
           // animate.css 3.7.0+ honors "prefers-reduced-motion"
-          let art = el.firstElementChild;
           let animate = document.getElementById("animate");
-
           val = val ? val.value : animate.selectedOptions[0].value;
           for (let i = 0; i < animate.length; i++) {
-            art.classList.remove(animate.options[i].value);
+            media.classList.remove(animate.options[i].value);
           }
-          art.classList.add(val);
+          media.classList.add(val);
           break;
         case "fa-asterisk":
           // set title
           val = val ? val.value : document.getElementById("meta").value;
           el.setAttribute("data-meta", val);
           // set property
-          let media =
-            el.firstElementChild.firstElementChild || el.firstElementChild;
-          let type = media.nodeName.toLowerCase();
-          if (media) {
-            if (type == "a") {
-              // set hyperlink
-              media.setAttribute("href", val);
-            } else {
-              if (val.charAt(0) == ".") {
-                // set onionskin if prefix match
+          media = media.firstElementChild || media;
 
-                let group = sm.var.stage.querySelectorAll(
-                  "[data-meta='" + val + "']"
-                );
-                let dur = 0.25;
-                for (let i = 0; i < group.length; i++) {
-                  let el = group[i];
-                  el.classList.remove("onion");
-                  el.style.removeProperty("animation-delay");
-                  el.style.removeProperty("animation-duration");
-
-                  setTimeout(() => {
-                    // bug with set property timing
-                    el.classList.add("onion");
-                    el.style.setProperty("animation-delay", i * dur + "s");
-                    el.style.setProperty(
-                      "animation-duration",
-                      dur * group.length + "s"
-                    );
-                  }, 2000);
-                }
-              } else {
+          if (title == "fa-link") {
+            // set hyperlink
+            media.setAttribute("src", val);
+          } else if (title == "fa-external-link-alt") {
+            // set href
+            media.setAttribute("href", val);
+          } else {
+            if (val.charAt(0) == ".") {
+              // set onionskin if prefix match
+              let group = sm.var.stage.querySelectorAll(
+                "[data-meta='" + val + "']"
+              );
+              let dur = 0.25;
+              for (let i = 0; i < group.length; i++) {
+                let el = group[i];
                 el.classList.remove("onion");
+                el.style.removeProperty("animation-delay");
+                el.style.removeProperty("animation-duration");
+
+                setTimeout(() => {
+                  // bug with set property timing
+                  el.classList.add("onion");
+                  el.style.setProperty("animation-delay", i * dur + "s");
+                  el.style.setProperty(
+                    "animation-duration",
+                    dur * group.length + "s"
+                  );
+                }, 2000);
               }
+            } else {
+              el.classList.remove("onion");
             }
           }
           break;
@@ -498,19 +533,35 @@ sm = {
           // ui theme
           document.body.classList.toggle(title.slice(3));
         } else if (title == "fa-film") {
-          sm.tools.render(sm.var.tools.querySelector("#frames"));
+          if (typeof domtoimage != "undefined") {
+            sm.tools.render(document.getElementById("frames"));
+          } else {
+            let js_dti = document.createElement("script");
+            js_dti.src =
+              "//cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js";
+            js_dti.onload = function () {
+              let js_gs = document.createElement("script");
+              js_gs.src =
+                "//cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js";
+              js_gs.onload = function () {
+                sm.tools.render(document.getElementById("frames"));
+              };
+              document.head.appendChild(js_gs);
+            };
+            document.head.appendChild(js_dti);
+          }
         } else if (title == "fa-running") {
           if (label.classList.contains("active")) {
             console.log("HTTPRelay mcast");
             if (sm.mcast.getXhr == undefined) {
               // inject jquery?
-              let js = document.createElement("script");
-              js.src = "//code.jquery.com/jquery-3.6.0.min.js";
-              js.onload = function () {
+              let js_j = document.createElement("script");
+              js_j.src = "//code.jquery.com/jquery-3.6.0.min.js";
+              js_j.onload = function () {
                 sm.mcast.receive(true);
                 sm.mcast.post();
               };
-              document.head.appendChild(js);
+              document.head.appendChild(js_j);
               label.querySelector("input[type=checkbox]").disabled = true;
             }
           } else {
@@ -550,7 +601,7 @@ sm = {
                 let txt = document.createElement("textarea");
                 div.classList.add("txt", "fa-font");
                 div.appendChild(txt);
-                txt.value = fr.result;
+                txt.innerText = fr.result;
               } else {
                 // type image
 
@@ -558,23 +609,33 @@ sm = {
                 div.classList.add("art", "fa-image");
 
                 img.onload = function () {
-                  //console.log(file);
-                  if (file.type == "image/gif" && file.size <= 56000) {
-                    // gif under 56kb
-                    //div.appendChild(img);
+                  if (
+                    (file.type == "image/gif" ||
+                      file.type.indexOf("svg") > -1) &&
+                    file.size <= 80000
+                  ) {
+                    // size <=80kb, native gif or svg
                     div.style.backgroundImage = "url(" + img.src + ")";
                   } else {
+                    // reduce size and compress jpeg
                     let canvas = sm.tools.fileMax(img);
                     let imgMax = document.createElement("img");
-                    imgMax.src = canvas.toDataURL(file.type, 0.5);
+                    imgMax.src = canvas.toDataURL("image/jpeg", 0.7);
+
+                    // second pass...?
+                    let res = new Blob([imgMax.src]).size;
+                    if (res >= 160000) {
+                      console.log("res exceed...?");
+                    }
+
                     canvas = null;
-                    //div.appendChild(imgMax);
                     div.style.backgroundImage = "url(" + imgMax.src + ")";
                   }
                 };
 
                 img.src = fr.result;
               }
+
               dst.appendChild(div);
               sm.interact.drag(div);
             };
@@ -628,7 +689,8 @@ sm = {
           if (el != null) {
             let col = event.target.value;
             el.firstElementChild.style.color = col;
-            el.firstElementChild.style.fill = col;
+            let path = el.querySelector("svg path:last-child");
+            path && (path.style.fill = col);
             sm.mcast.add(el.id, "fa-fill", { value: col });
           }
         });
@@ -695,7 +757,7 @@ sm = {
                 gif = document.createElement("img");
               gif.src = link.href = base64;
               link.append(gif);
-              link.download = "render.gif";
+              link.download = "sm_render_"+Date.now()+".gif";
               link.target = "_blank";
               output.appendChild(link);
             }
@@ -752,7 +814,7 @@ sm = {
       }
     },
     add: function (idx, type, opts = {}) {
-      //console.log(idx,type,opts)
+      console.log("add", idx, type, opts);
       if (!idx || !type) {
         return;
       }
@@ -773,8 +835,10 @@ sm = {
         if (entryOld.idx == entryNew.idx) {
           let stale =
             entryOld.type == entryNew.type &&
-            entryOld.type != "canvas" &&
-            entryOld.type != "svg";
+            entryNew.type != "canvas" &&
+            entryNew.type != "svg" &&
+            entryNew.type != "path" &&
+            !(entryNew.type == "fa-eraser" && entryNew.value == "path");
           if (stale || entryNew.type == "fa-trash-alt") {
             entryOld = null;
             events.splice(i, 1);
@@ -854,13 +918,18 @@ sm = {
                   sm.stage.canvas(el, entry.x, entry.y, entry.col);
                   break;
                 case "svg":
+                case "path":
                   el = el.querySelector("svg");
-                  sm.stage.svg(el, entry.x, entry.y, entry.col);
+                  sm.stage.svg(el, entry.x, entry.y, entry.col, entry.edit);
                   break;
                 case "textarea":
                   el = el.querySelector("textarea");
                   el.value = entry.value;
                   break;
+                //case "fa-eraser":
+                //sm.tools.set();
+                //eraser
+                //break;
                 // io.labels
                 default:
                   sm.tools.set(el, type, entry);
