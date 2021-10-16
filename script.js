@@ -205,7 +205,6 @@ sm = {
       document.addEventListener("keyup", function (e) {
         let el = e.target;
         let name = el.nodeName.toLowerCase();
-        console.log(el, name);
 
         if (name == "textarea") {
           // io.textarea
@@ -259,7 +258,7 @@ sm = {
                 height: height + "px",
                 scale: Math.round(scale * 2) / 2
               };
-              console.log(val);
+              //console.log(val);
             } else if (e.key == "Tab") {
               //  e.preventDefault();
               //  el = sm.var.stage.querySelector(".edit");
@@ -280,7 +279,6 @@ sm = {
       });
     },
     draw: function (e) {
-      console.log("draw", e);
       if (e instanceof HTMLElement) {
         // pointerup, pointerleave, DOMNodeRemoved
         e.removeEventListener("pointermove", sm.stage.draw);
@@ -328,7 +326,6 @@ sm = {
         }
       }
 
-      //console.log("raster", e, canvas);
       let ctx = el.getContext("2d");
       // size native
       let bound = el.getBoundingClientRect();
@@ -347,7 +344,6 @@ sm = {
       );
     },
     svg: function (el, x, y, col, edit) {
-      console.log("svg", el, x, y, col, edit);
       //codepen.io/GreenSock/pen/wvgGxEr
       //codepen.io/GreenSock/pen/8fcb337385d0f1e401a66f260cf73e76
       if (typeof el == "string") {
@@ -385,7 +381,6 @@ sm = {
   },
   tools: {
     set: function (el, event, val) {
-      console.log(el, event, val);
 
       let media = el.firstElementChild;
       const fa = /(fa)(-[a-z]+)+/g;
@@ -696,6 +691,7 @@ sm = {
         });
     },
     render: function (output) {
+      console.log("render frames to gif");
       // link crossorigin rel=stylesheet
       output.innerHTML = "";
 
@@ -713,7 +709,6 @@ sm = {
       let duration = setInterval(function () {
         // frame every 0.2 seconds for 1 second
         let frames = output.getElementsByTagName("img");
-        console.log(frames, prog);
 
         if (prog.queue > 0) {
           prog.queue--;
@@ -737,7 +732,6 @@ sm = {
       }, prog.step);
 
       function composite(frames) {
-        console.log("composite", frames);
         gifshot.createGIF(
           {
             images: Array.from(frames),
@@ -748,7 +742,6 @@ sm = {
             sampleInterval: 20
           },
           function (obj) {
-            console.log(obj);
             if (!obj.error) {
               output.innerHTML = "";
 
@@ -814,7 +807,6 @@ sm = {
       }
     },
     add: function (idx, type, opts = {}) {
-      console.log("add", idx, type, opts);
       if (!idx || !type) {
         return;
       }
@@ -943,3 +935,4 @@ sm = {
 };
 
 sm.init();
+console.log("Shortcuts:","Delete/Backspace","[/]","Arrow Keys", "+/-", "")
