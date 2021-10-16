@@ -13,33 +13,33 @@
 
   <!--modify-->
   <fieldset id="ui">
-    <label class="fas fa-expand" title="Toggle compact layout.">
-      <span>hide</span>
+    <label class="fas fa-expand" title="Toggle dense layout.">
+      <span>dense</span>
     </label>
     <label class="fas fa-adjust" title="Toggle color scheme.">
-      <span>dark</span>
+      <span>theme</span>
     </label>
     <hr />
-    <label class="fas fa-trash-alt" title="Selected item removed from stage.">
+    <label class="fas fa-trash-alt" title="Remove from stage.">
       <span>trash</span>
     </label>
-    <label class="fas fa-eraser" title="Draw on canvas erases pixels.">
+    <label class="fas fa-eraser" title="Erase pixels or points.">
       <span>erase</span>
       <input type="checkbox" id="erase" />
     </label>
-    <label class="fas fa-fill" title="Selected item applies value by type.">
+    <label class="fas fa-fill" title="Apply color.">
       <span>color</span>
       <input type="color" value="#8f8f8f" id="color" />
     </label>
-    <label class="fas fa-sort-amount-down" title="Selected item moves back one layer.">
+    <label class="fas fa-sort-amount-down" title="Send back one layer.">
       <span>order</span>
     </label>
-    <label class="fas fa-asterisk" title="Selected item applies value by type. All types set title. Link sets href. Canvas sets onionskin if prefix is period.">
+    <label class="fas fa-asterisk" title="All set title. Link sets src. External link sets href. Canvas sets onionskin if prefix is period.">
       <span>meta</span>
       <input type="checkbox" />
       <input type="text" placeholder="title, url, or .onion" id="meta" />
     </label>
-    <label class="far fa-play-circle" title="A random Animate.css effect is applied.">
+    <label class="far fa-play-circle" title="Apply Animate.css effect.">
       <span>motion</span>
       <input type="checkbox" />
       <select id="animate">
@@ -67,7 +67,7 @@
       <div id="frames"></div>
     </label>
     <hr />
-    <label class="fas fa-running" title="Stage shared via HTTPRelay mcast.">
+    <label class="fas fa-running" title="Share stage via HTTPRelay mcast.">
       <span>relay</span>
       <input type="checkbox" id="relay" />
     </label>
@@ -75,7 +75,7 @@
 
   <!--create-->
   <fieldset>
-    <label class="dir fas fa-font" title="Add editable text.">
+    <label class="dir fas fa-font" title="Add file or text.">
       <span>text</span>
       <input type="file" id="txt" accept="text/*" multiple />
     </label>
@@ -108,19 +108,22 @@
 
   </fieldset>
   <fieldset>
-    <label class="dir fas fa-images" title="Add image or link.">
-      <span>image</span>
+    <label class="dir fas fa-images" title="Add photo, graphic or link.">
+      <span>media</span>
       <input type="file" id="img" accept="image/*" multiple />
     </label>
     <div class="ico fas art fa-edit">
       <canvas width="512" height="512"></canvas>
     </div>
     <div class="ico fas art fa-draw-polygon">
-      <svg width="512" height="512" viewBox="0 0 512 512">
-        <polygon points=""></polygon>
+      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" viewBox="0 0 512 512">
+        <!--<path d="MZ" />-->
       </svg>
     </div>
     <div class="ico fas art fa-link">
+      <iframe src="//youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="encrypted-media;"></iframe>
+    </div>
+    <div class="ico fas art fa-external-link-alt">
       <a target="_blank" href="#"></a>
     </div>
     <div id="imgDst">
@@ -128,8 +131,8 @@
     </div>
   </fieldset>
   <fieldset>
-    <label class="dir fas fa-icons" title="Add stencil from Font Awesome.">
-      <span>stencil</span>
+    <label class="dir fas fa-icons" title="Add icon from Font Awesome.">
+      <span>icon</span>
     </label>
     <div class="page current" data-title="avatar">
       <div class="ico fas fa-smile"></div>
