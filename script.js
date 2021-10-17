@@ -51,28 +51,32 @@ sm = {
             })
           ]
         })
-        .on("dragmove", function (event) {
-          let target = event.target;
+        .on("dragmove", function (e) {
           // get previous
-          let x = parseFloat(target.getAttribute("data-x")) || 0;
-          let y = parseFloat(target.getAttribute("data-y")) || 0;
-          x += event.dx;
-          y += event.dy;
+          let x = parseFloat(e.target.getAttribute("data-x")) || 0;
+          let y = parseFloat(e.target.getAttribute("data-y")) || 0;
+          x += e.dx;
+          y += e.dy;
           // set position
-          target.style.transform = "translate(" + x + "px, " + y + "px)";
-          target.setAttribute("data-x", x);
-          target.setAttribute("data-y", y);
+          e.target.style.transform = "translate(" + x + "px, " + y + "px)";
+          e.target.setAttribute("data-x", x);
+          e.target.setAttribute("data-y", y);
         })
-        .on("dragend", function (event) {
-          let target = event.target;
-          if (target.id != "tools") {
+        .on("dragend", function (e) {
+          if (e.target.id != "tools") {
             // io.dragmove
-            sm.mcast.add(target.id, event.type, {
-              x: target.getAttribute("data-x"),
-              y: target.getAttribute("data-y")
+            sm.mcast.add(e.target.id, e.type, {
+              x: e.target.getAttribute("data-x"),
+              y: e.target.getAttribute("data-y")
             });
           }
-        });
+        })
+        .on('hold', function (e) {
+          let toggle = e.currentTarget.classList.contains("rotate"); 
+          let val = {name:"rotate", value:!toggle};
+          sm.tools.set(e.currentTarget, "class", val);
+          sm.mcast.add(e.currentTarget.id, "class", val);
+        })
     },
     resize: function (el) {
       interact(el)
@@ -106,7 +110,7 @@ sm = {
           //target.style.fontSize = min + "px";
           target.setAttribute(
             "data-scale",
-            Math.round((min / (sm.var.unit / 2)) * 2) / 2
+            Math.round((min / sm.var.unit) * 2) / 2
           );
         })
         .on("resizeend", function (event) {
@@ -201,10 +205,12 @@ sm = {
       });
     },
     type: function () {
-      //keydown while drag?
       document.addEventListener("keyup", function (e) {
         let el = e.target;
         let name = el.nodeName.toLowerCase();
+        if (e.key == "Escape") {
+          console.log("Shortcuts:", "Arrow Keys:", "+/-", "");
+        }
 
         if (name == "textarea") {
           // io.textarea
@@ -216,10 +222,13 @@ sm = {
           el = sm.var.stage.querySelector(".sel.edit");
           let title, val;
           if (el) {
-            if (e.key == "Delete" || e.key == "Backspace") {
+            if (e.key == "Delete") {
               title = "fa-trash-alt";
+            } else if (e.key == "Backspace") {
+              title = "fa-eraser";
             } else if (e.key == "[" || e.key == "]") {
               title = "fa-sort-amount-down";
+              val = {value:e.key};
               // directional...?
             } else if (
               e.key == "ArrowLeft" ||
@@ -248,7 +257,7 @@ sm = {
               let width = el.offsetWidth + zoom;
               let height = el.offsetHeight + zoom;
 
-              let scale = Math.min(
+              let min = Math.min(
                 width - (width % sm.var.unit),
                 height - (height % sm.var.unit)
               );
@@ -256,18 +265,9 @@ sm = {
               val = {
                 width: width + "px",
                 height: height + "px",
-                scale: Math.round(scale * 2) / 2
+                scale: Math.round((min / sm.var.unit) * 2) / 2
               };
               //console.log(val);
-            } else if (e.key == "Tab") {
-              //  e.preventDefault();
-              //  el = sm.var.stage.querySelector(".edit");
-              //  //TEST
-              //  let dir = (el && el.nextElementSibling) || sm.var.stage.querySelector(".sel") ;
-              //  if (dir) {
-              //    el && el.classList.remove("edit");
-              //    dir.classList.add("edit");
-              //  }
             }
 
             if (title) {
@@ -381,10 +381,9 @@ sm = {
   },
   tools: {
     set: function (el, event, val) {
-
       let media = el.firstElementChild;
       const fa = /(fa)(-[a-z]+)+/g;
-      let title = media.className.match(fa)[0];
+      let title = media && media.className.match(fa)[0];
 
       switch (event) {
         // remote/local event val ? provided : retrieved
@@ -400,6 +399,9 @@ sm = {
           el.setAttribute("data-y", val.y);
           el.style.transform = "translate(" + val.x + "px, " + val.y + "px)";
           break;
+        case "class":
+          el.classList.toggle(val.name,val.val);
+          break;
         case "fa-trash-alt":
           let canvas = el.querySelector("canvas");
           if (canvas) {
@@ -410,8 +412,11 @@ sm = {
           el = null;
           break;
         case "fa-sort-amount-down":
-          if (el.previousElementSibling) {
+          val = val ? val.value : "[";
+          if (el.previousElementSibling && val=="[") {
             el.parentNode.insertBefore(el, el.previousElementSibling);
+          }else if(el.nextElementSibling && val=="]"){
+            el.parentNode.insertBefore(el.nextElementSibling, el);
           }
           break;
         case "fa-eraser":
@@ -449,6 +454,7 @@ sm = {
           break;
         case "fa-asterisk":
           // set title
+          console.log("val", val);
           val = val ? val.value : document.getElementById("meta").value;
           el.setAttribute("data-meta", val);
           // set property
@@ -610,6 +616,7 @@ sm = {
                     file.size <= 80000
                   ) {
                     // size <=80kb, native gif or svg
+                    //div.appendChild(img);
                     div.style.backgroundImage = "url(" + img.src + ")";
                   } else {
                     // reduce size and compress jpeg
@@ -625,6 +632,7 @@ sm = {
 
                     canvas = null;
                     div.style.backgroundImage = "url(" + imgMax.src + ")";
+                    //div.appendChild(imgMax);
                   }
                 };
 
@@ -692,7 +700,8 @@ sm = {
     },
     render: function (output) {
       console.log("render frames to gif");
-      // link crossorigin rel=stylesheet
+      // css link rel=stylesheet must be crossorigin
+      document.body.classList.add("render");
       output.innerHTML = "";
 
       // reduce filesize
@@ -709,6 +718,9 @@ sm = {
       let duration = setInterval(function () {
         // frame every 0.2 seconds for 1 second
         let frames = output.getElementsByTagName("img");
+
+        // img*=gif to canvas for frames
+        //let gifs = sm.var.stage.querySelectorAll("img[src*='gif']");
 
         if (prog.queue > 0) {
           prog.queue--;
@@ -743,6 +755,7 @@ sm = {
           },
           function (obj) {
             if (!obj.error) {
+              document.body.classList.remove("render");
               output.innerHTML = "";
 
               let base64 = obj.image,
@@ -750,7 +763,7 @@ sm = {
                 gif = document.createElement("img");
               gif.src = link.href = base64;
               link.append(gif);
-              link.download = "sm_render_"+Date.now()+".gif";
+              link.download = "sm_render_" + Date.now() + ".gif";
               link.target = "_blank";
               output.appendChild(link);
             }
@@ -763,7 +776,7 @@ sm = {
     //httprelay.io/features/mcast/
     uid: "u" + Date.now(),
     id: 0,
-    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_cp1",
+    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_cp2",
     getXhr: undefined, // global history
     history: { time: 0, events: [] }, // local history
     LZW: {
@@ -935,4 +948,3 @@ sm = {
 };
 
 sm.init();
-console.log("Shortcuts:","Delete/Backspace","[/]","Arrow Keys", "+/-", "")
