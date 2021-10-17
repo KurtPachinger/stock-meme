@@ -67,6 +67,24 @@ html {
     touch-action: none;
     overflow: hidden;
 
+    &.render {
+      // hide ui during render
+      .sel,
+      canvas,
+      svg,
+      .art * {
+        background: none !important;
+        box-shadow: none !important;
+        .art:before,
+        .txt:before {
+          display: none !important;
+        }
+        svg path:last-child {
+          stroke: none!important;
+        }
+      }
+    }
+
     .w50 {
       width: 50%;
       float: left;
@@ -264,26 +282,17 @@ html {
         z-index: 9;
       }
     }
-
-    .ico,
+    
     .sel {
-      // ux
-      touch-action: none;
-      user-select: none;
-      float: left;
-      text-align: center;
-      // ui
-      width: $unit;
-      height: $unit;
-      font-size: $unit;
-      //color: $medium;
-      background-color: rgba(128, 128, 128, 0.125);
-      border-radius: 0.25rem;
-
-      &.sel {
         textarea {
           text-indent: 1em;
         }
+      &.rotate{
+        canvas, svg, .fa-image, .fas:not(.art):not(.txt){
+        transform: scaleX(-1);
+        }
+      }
+      
         &.onion {
           opacity: 0;
           animation: 1s infinite onion;
@@ -293,7 +302,8 @@ html {
           70% {
             opacity: 0;
           }
-          80%, 90% {
+          80%,
+          90% {
             opacity: 1;
           }
           100% {
@@ -339,6 +349,21 @@ html {
         }
       }
 
+    .ico,
+    .sel {
+      // ux
+      touch-action: none;
+      user-select: none;
+      float: left;
+      text-align: center;
+      // ui
+      width: $unit;
+      height: $unit;
+      font-size: $unit;
+      //color: $medium;
+      background-color: rgba(128, 128, 128, 0.125);
+      border-radius: 0.25rem;
+
       &:before {
         // icon top-center
         z-index: 3;
@@ -376,6 +401,8 @@ html {
           margin: auto;
           max-width: 100%;
           max-height: 100%;
+          display: block;
+          transition: transform 0.25s;
         }
         svg {
           // responsive
@@ -498,6 +525,7 @@ html {
         > div {
           display: table-cell;
           vertical-align: middle;
+          padding: ($unit/2);
         } //or table-cell vertical-align
         // scale icon
         .fas:before {
