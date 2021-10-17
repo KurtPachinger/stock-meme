@@ -295,7 +295,8 @@ html {
       
         &.onion {
           opacity: 0;
-          animation: 1s infinite onion;
+          animation-name: onion;
+          animation-iteration-count: infinite;
         }
         @keyframes onion {
           0%,
