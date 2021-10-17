@@ -482,6 +482,7 @@ sm = {
                 setTimeout(() => {
                   // bug with set property timing
                   el.classList.add("onion");
+                  el.style.setProperty("animation-timing-function", "steps("+group.length+")")
                   el.style.setProperty("animation-delay", i * dur + "s");
                   el.style.setProperty(
                     "animation-duration",
