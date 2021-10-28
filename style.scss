@@ -52,6 +52,7 @@ body {
   // js events assume absolute document(0,0) = #stage(0,0)
   width: 100%;
   height: 100%;
+  min-height: 100%;
 }
 html {
   // base
@@ -61,6 +62,7 @@ html {
     font-size: 0.75rem;
     font-family: system-ui, Helvetica, Arial, sans-serif;
     font-weight: normal;
+    line-height:0.75;
   }
 
   body {
@@ -80,16 +82,12 @@ html {
           display: none !important;
         }
         svg path:last-child {
-          stroke: none!important;
+          stroke: none !important;
         }
       }
     }
 
-    .w50 {
-      width: 50%;
-      float: left;
-    }
-
+    
     .ico,
     .sel {
       // tooltips
@@ -97,7 +95,7 @@ html {
       &.sel:after {
         content: attr(data-meta);
       }
-      &:after {
+      &:not(.fa-trash-alt):after {
         pointer-events: none;
         font-family: monospace !important;
         color: var(--gray);
@@ -147,11 +145,20 @@ html {
         color: var(--medium);
         border: none;
         margin-bottom: ($gutter/2);
+        
+        .hide{display:none;}
+        .w25 {
+          width: 25%;
+          float: left;
+          text-align: center;
+          span{display: none;}
+        }
 
         label {
           position: relative;
           input,
-          select {
+          select,
+          .more {
             appearance: none;
             border-radius: 0;
             opacity: 0;
@@ -160,6 +167,7 @@ html {
             left: 0;
             height: 100%;
             z-index: -9;
+            border: 0;
           }
           input[type="text"] {
             user-select: all;
@@ -169,10 +177,12 @@ html {
           }
           input[type="checkbox"]:checked {
             & + input,
-            & + select {
+            & + select,
+            & + .more{
               opacity: 1;
               width: ($unit * 4);
               left: 100%;
+              margin-left: $gutter;
               background: var(--gray);
               color: var(--dark);
             }
@@ -239,6 +249,13 @@ html {
         box-shadow: var(--gray) 0px 0px 0px $gutter inset;
         opacity: 0.5;
         transition: transform 0.125s ease-out;
+        
+        &.fa-trash-alt{
+          padding: 0;
+          color: var(--dark);
+          background: none;
+          span{display:none;width:100%;float:left;}
+        }
 
         // ux
         &:hover {
@@ -282,73 +299,8 @@ html {
         z-index: 9;
       }
     }
+
     
-    .sel {
-        textarea {
-          text-indent: 1em;
-        }
-      &.rotate{
-        canvas, svg, .fa-image, .fas:not(.art):not(.txt){
-        transform: scaleX(-1);
-        }
-      }
-      
-        &.onion {
-          opacity: 0;
-          animation-name: onion;
-          animation-iteration-count: infinite;
-        }
-        @keyframes onion {
-          0%,
-          70% {
-            opacity: 0;
-          }
-          80%,
-          90% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-          }
-        }
-
-        // stage
-        position: absolute;
-        &:hover,
-        &.edit {
-          box-shadow: var(--medium) (-$gutter) (-$gutter) 0px $gutter inset;
-          canvas,
-          svg {
-            background: repeating-conic-gradient(
-                rgba(128, 128, 128, 0.05) 0% 25%,
-                transparent 0% 50%
-              )
-              50% / 1em 1em;
-            path:last-child {
-              stroke: var(--dark);
-              stroke-width: $gutter;
-              stroke-dasharray: ($unit/2) ($unit/2);
-              stroke-dashoffset: 0%;
-              animation: 30s infinite linear marquee;
-            }
-            @keyframes marquee {
-              to {
-                stroke-dashoffset: 100%;
-              }
-            }
-          }
-        }
-        &:not(:hover) {
-          &:not(.edit) {
-            opacity: 0.5;
-          }
-        }
-
-        .art,
-        .txt {
-          //padding: 0 0.5rem 0.25rem 0;
-        }
-      }
 
     .ico,
     .sel {
@@ -500,6 +452,115 @@ html {
         //font-size: $unit;
       }
     }
+    
+    
+    .sel {
+      // modify appearance or stage-specific transforms
+      
+      textarea {
+        text-indent: 0.5em;
+      }
+      
+      &.text-height textarea{
+        font-size:2em;
+      }
+      &.align-right textarea {
+        text-align:right;
+      }
+      &.star-half-alt{
+        mix-blend-mode:screen;
+        textarea{
+          text-shadow:0.05em 0.05em #fff;
+          background-color:#fff;
+        }
+      }
+      
+      $media: "canvas, svg, textarea, .fa-image, .fas:not(.art):not(.txt):before";
+        
+      &.arrows-alt-h {#{$media}{--t1: scaleX(-1);}}
+      &.arrows-alt-v {#{$media}{--t2: scaleY(-1);}}
+      &.sync-alt {#{$media}{--t3: rotate(90deg);}}
+      
+        #{$media} {
+          transform:
+            //stackoverflow.com/a/61433630/4177852
+            var(--t1,scaleX(1)) 
+            var(--t2,scaleY(1)) 
+            var(--t3,rotate(0)) 
+            var(--t4,translate(0));
+          //animation: yoyo var(--t5,1s) infinite alternate;
+          animation-name: yoyo;
+          animation-duration: var(--t5, 0.0s);
+          animation-iteration-count: infinite;
+        }
+
+      @keyframes yoyo {
+        to{
+          //stackoverflow.com/a/61433630/4177852
+          transform:
+            var(--t1,scaleX(1)) 
+            var(--t2,scaleY(1)) 
+            var(--t3,rotate(0));
+            //--t4 animation
+        }
+      }
+
+      &.onion {
+        opacity: 0;
+        animation-name: onion;
+        animation-iteration-count: infinite;
+      }
+      @keyframes onion {
+        0%,
+        70% {
+          opacity: 0;
+        }
+        80%,
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      // stage
+      position: absolute;
+      &:hover,
+      &.edit {
+        box-shadow: var(--medium) (-$gutter) (-$gutter) 0px $gutter inset;
+        canvas,
+        svg {
+          background: repeating-conic-gradient(
+              rgba(128, 128, 128, 0.05) 0% 25%,
+              transparent 0% 50%
+            )
+            50% / 1em 1em;
+          path:last-child {
+            stroke: var(--dark);
+            stroke-width: $gutter;
+            stroke-dasharray: ($unit/2) ($unit/2);
+            stroke-dashoffset: 0%;
+            animation: 30s infinite linear marquee;
+          }
+          @keyframes marquee {
+            to {
+              stroke-dashoffset: 100%;
+            }
+          }
+        }
+      }
+      &:not(:hover) {
+        &:not(.edit) {
+          opacity: 0.5;
+        }
+      }
+
+      .art,
+      .txt {
+        //padding: 0 0.5rem 0.25rem 0;
+      }
+    }
 
     #stage {
       width: 100%;
@@ -531,7 +592,7 @@ html {
         // scale icon
         .fas:before {
           display: block;
-          transition: transform 0.25s;
+          //transition: transform 0.25s;
         }
         @for $i from 1 through 32 {
           $frc: ($i/2);
@@ -574,7 +635,7 @@ html {
     }
   }
 
-  #frames {
+  #fa-film {
     img {
       width: 100%;
     }
