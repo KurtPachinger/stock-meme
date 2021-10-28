@@ -46,7 +46,7 @@ sm = {
               ]
             }),
             interact.modifiers.restrictRect({
-              restriction: "#" + sm.var.stage.id,
+              restriction: document.body,
               endOnly: true
             })
           ]
@@ -70,13 +70,7 @@ sm = {
               y: e.target.getAttribute("data-y")
             });
           }
-        })
-        .on('hold', function (e) {
-          let toggle = e.currentTarget.classList.contains("rotate"); 
-          let val = {name:"rotate", value:!toggle};
-          sm.tools.set(e.currentTarget, "class", val);
-          sm.mcast.add(e.currentTarget.id, "class", val);
-        })
+        });
     },
     resize: function (el) {
       interact(el)
@@ -152,7 +146,7 @@ sm = {
           clone.classList.add("animated", "infinite");
           clone.removeAttribute("data-x");
           clone.removeAttribute("data-y");
-          let color = document.getElementById("color").value;
+          let color = document.getElementById("fa-eye-dropper").value;
           //clone.style.cursor = clone.style.transform = "";
           clone.style.color = color;
           clone.style.fill = color;
@@ -162,7 +156,7 @@ sm = {
           sm.interact.resize(wrap);
 
           // drop clone
-          wrap.id = sm.mcast.uid + "_" + sm.mcast.id++;
+          wrap.id = sm.mcast.log.uid + "_" + sm.mcast.log.id++;
           wrap.appendChild(clone);
           sm.var.stage.appendChild(wrap);
 
@@ -206,29 +200,32 @@ sm = {
     },
     type: function () {
       document.addEventListener("keyup", function (e) {
-        let el = e.target;
-        let name = el.nodeName.toLowerCase();
+        let el = sm.var.stage.querySelector(".sel.edit");
+        let name = e.target.nodeName.toLowerCase();
         if (e.key == "Escape") {
           console.log("Shortcuts:", "Arrow Keys:", "+/-", "");
         }
 
         if (name == "textarea") {
           // io.textarea
-          sm.mcast.add(el.closest(".sel").id, name, {
-            value: el.value
+          sm.mcast.add(el.id, name, {
+            value: e.target.value
           });
         } else if (name == "body") {
           // body
-          el = sm.var.stage.querySelector(".sel.edit");
           let title, val;
           if (el) {
             if (e.key == "Delete") {
               title = "fa-trash-alt";
             } else if (e.key == "Backspace") {
               title = "fa-eraser";
+              let target = el.querySelector("canvas, svg");
+              target && (target = target.nodeName.toLowerCase());
+              val = { value: target };
             } else if (e.key == "[" || e.key == "]") {
-              title = "fa-sort-amount-down";
-              val = {value:e.key};
+              title = "fa-level";
+              title += e.key == "[" ? "-down-alt" : "-up-alt";
+              val = { value: e.key };
               // directional...?
             } else if (
               e.key == "ArrowLeft" ||
@@ -293,9 +290,9 @@ sm = {
       let name = el.nodeName.toLowerCase();
       if (el != sm.var.stage && name != "div") {
         // set tool/color
-        let col = document.getElementById("erase").checked
+        let col = document.getElementById("fa-eraser").checked
           ? "transparent"
-          : document.getElementById("color").value;
+          : document.getElementById("fa-eye-dropper").value;
 
         let edit = el.closest(".sel").classList.contains("edit");
         if (name == "canvas") {
@@ -320,7 +317,7 @@ sm = {
     },
     canvas: function (el, x, y, col) {
       if (typeof el == "string") {
-        el = document.querySelector("#" + el + " canvas");
+        el = sm.var.stage.querySelector("#" + el + " canvas");
         if (!el) {
           return;
         }
@@ -344,8 +341,14 @@ sm = {
       );
     },
     svg: function (el, x, y, col, edit) {
+      // vanilla JS
+      //stackoverflow.com/questions/42954295/
+      // GreenSock
       //codepen.io/GreenSock/pen/wvgGxEr
       //codepen.io/GreenSock/pen/8fcb337385d0f1e401a66f260cf73e76
+      // interact.js
+      //codepen.io/lao-tseu-is-alive/pen/ZamYRY
+      //codepen.io/taye/pen/xEJeo
       if (typeof el == "string") {
         el = document.querySelector("#" + el + " svg");
         if (!el) {
@@ -384,6 +387,7 @@ sm = {
       let media = el.firstElementChild;
       const fa = /(fa)(-[a-z]+)+/g;
       let title = media && media.className.match(fa)[0];
+      let val_uid = document.getElementById(event);
 
       switch (event) {
         // remote/local event val ? provided : retrieved
@@ -399,9 +403,6 @@ sm = {
           el.setAttribute("data-y", val.y);
           el.style.transform = "translate(" + val.x + "px, " + val.y + "px)";
           break;
-        case "class":
-          el.classList.toggle(val.name,val.val);
-          break;
         case "fa-trash-alt":
           let canvas = el.querySelector("canvas");
           if (canvas) {
@@ -411,11 +412,13 @@ sm = {
           el.parentNode.removeChild(el);
           el = null;
           break;
-        case "fa-sort-amount-down":
-          val = val ? val.value : "[";
-          if (el.previousElementSibling && val=="[") {
+        case "fa-level-down-alt":
+        case "fa-level-up-alt":
+          let sort = event == "fa-level-down-alt" ? "[" : "]";
+          val = val ? val.value : sort;
+          if (el.previousElementSibling && val == "[") {
             el.parentNode.insertBefore(el, el.previousElementSibling);
-          }else if(el.nextElementSibling && val=="]"){
+          } else if (el.nextElementSibling && val == "]") {
             el.parentNode.insertBefore(el.nextElementSibling, el);
           }
           break;
@@ -435,8 +438,8 @@ sm = {
             }
           }
           break;
-        case "fa-fill":
-          val = val ? val.value : document.getElementById("color").value;
+        case "fa-eye-dropper":
+          val = val ? val.value : val_uid.value;
           media.style.color = val;
           if (title == "fa-draw-polygon") {
             media = media.querySelector("svg path:last-child");
@@ -445,62 +448,106 @@ sm = {
           break;
         case "fa-play-circle":
           // animate.css 3.7.0+ honors "prefers-reduced-motion"
-          let animate = document.getElementById("animate");
-          val = val ? val.value : animate.selectedOptions[0].value;
-          for (let i = 0; i < animate.length; i++) {
-            media.classList.remove(animate.options[i].value);
+
+          val = val ? val.value : val_uid.selectedOptions[0].value;
+          for (let i = 0; i < val_uid.length; i++) {
+            media.classList.remove(val_uid.options[i].value);
           }
           media.classList.add(val);
           break;
         case "fa-asterisk":
-          // set title
+          val = val ? val.value : val_uid.value;
           console.log("val", val);
-          val = val ? val.value : document.getElementById("meta").value;
-          el.setAttribute("data-meta", val);
-          // set property
-          media = media.firstElementChild || media;
+          let metaOld = el.getAttribute("data-meta");
+          // no change?
+          if (metaOld != val) {
+            // elements pre/post
+            el.setAttribute("data-meta", val);
 
-          if (title == "fa-link") {
-            // set hyperlink
-            media.setAttribute("src", val);
-          } else if (title == "fa-external-link-alt") {
-            // set href
-            media.setAttribute("href", val);
-          } else {
-            if (val.charAt(0) == ".") {
-              // set onionskin if prefix match
-              let group = sm.var.stage.querySelectorAll(
-                "[data-meta='" + val + "']"
-              );
-              let dur = 0.25;
-              for (let i = 0; i < group.length; i++) {
-                let el = group[i];
-                el.classList.remove("onion");
-                el.style.removeProperty("animation-delay");
-                el.style.removeProperty("animation-duration");
-
-                setTimeout(() => {
-                  // bug with set property timing
-                  el.classList.add("onion");
-                  el.style.setProperty("animation-timing-function", "steps("+group.length+")")
-                  el.style.setProperty("animation-delay", i * dur + "s");
-                  el.style.setProperty(
-                    "animation-duration",
-                    dur * group.length + "s"
-                  );
-                }, 2000);
-              }
+            // media type
+            media = media.firstElementChild || media;
+            if (title == "fa-link") {
+              media.setAttribute("src", val);
+            } else if (title == "fa-external-link-alt") {
+              media.setAttribute("href", val);
             } else {
-              el.classList.remove("onion");
+              // effects: .onionskin, transform...
+              const tf = /\w+[(](.+)[)]/;
+              let transform = "translate(0)";
+
+              sequence(val);
+              sequence(metaOld);
+
+              function sequence(meta) {
+                meta = meta || "";
+                let group = sm.var.stage.querySelectorAll(
+                  "[data-meta='" + meta + "']"
+                );
+                let fx = meta.split(" ");
+
+                for (let i = 0; i < group.length; i++) {
+                  let el = group[i];
+                  for (let j = 0; j < fx.length; j++) {
+                    // onionskin, transform, or both
+                    let effect = fx[j];
+                    let onion = effect.charAt(0) == ".";
+                    let trans = effect.match(tf);
+                    trans && (trans = trans[0]);
+                    // 1s render loop
+                    let dur = 0;
+                    if(onion){
+                      dur =  1 / group.length 
+                    }else if(trans){
+                      dur=1
+                    };
+
+                    // UNSET
+                    // effects
+                    // just set to initial?
+                    el.style.removeProperty("animation-delay");
+                    el.style.removeProperty("animation-duration");
+                    el.style.removeProperty("animation-timing-function");
+                    // onion
+                    el.classList.remove("onion");
+                    // transform
+                    el.style.setProperty("--t4", trans || transform);
+                    el.style.setProperty("--t5", dur + "s");
+
+                    // SET
+
+                    setTimeout(() => {
+                      if (onion) {
+                        // onion
+                        el.classList.add("onion");
+                        el.style.setProperty(
+                          "animation-timing-function",
+                          "steps(" + group.length + ")"
+                        );
+                        el.style.setProperty("animation-delay", i * dur + "s");
+                        el.style.setProperty(
+                          "animation-duration",
+                          dur * group.length + "s"
+                        );
+                      }
+                    }, 2000);
+                  }
+                }
+              }
             }
           }
           break;
         default:
+          // class toggles...
+          val = val
+            ? val.value
+            : !el.classList.contains(event.replace("fa-", ""));
+          el.classList.toggle(event.replace("fa-", ""), val);
       }
 
       return val;
     },
     label: function (e) {
+      e.stopPropagation();
       if (e.target.nodeName.toLowerCase() != "label") {
         return;
       }
@@ -525,9 +572,8 @@ sm = {
         title = title.value.match(fa)[0];
 
         // tool state
-
         let checkbox = label.querySelector("input[type=checkbox]");
-        if (checkbox && !checkbox.disabled) {
+        if (checkbox) {
           label.classList.toggle("active");
         }
 
@@ -536,7 +582,7 @@ sm = {
           document.body.classList.toggle(title.slice(3));
         } else if (title == "fa-film") {
           if (typeof domtoimage != "undefined") {
-            sm.tools.render(document.getElementById("frames"));
+            sm.tools.render(document.getElementById(title));
           } else {
             let js_dti = document.createElement("script");
             js_dti.src =
@@ -546,36 +592,39 @@ sm = {
               js_gs.src =
                 "//cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js";
               js_gs.onload = function () {
-                sm.tools.render(document.getElementById("frames"));
+                sm.tools.render(document.getElementById(title));
               };
               document.head.appendChild(js_gs);
             };
             document.head.appendChild(js_dti);
           }
         } else if (title == "fa-running") {
-          if (label.classList.contains("active")) {
-            console.log("HTTPRelay mcast");
-            if (sm.mcast.getXhr == undefined) {
-              // inject jquery?
-              let js_j = document.createElement("script");
-              js_j.src = "//code.jquery.com/jquery-3.6.0.min.js";
-              js_j.onload = function () {
-                sm.mcast.receive(true);
-                sm.mcast.post();
-              };
-              document.head.appendChild(js_j);
-              label.querySelector("input[type=checkbox]").disabled = true;
-            }
+          //if (label.classList.contains("active")) {
+          console.log("HTTPRelay mcast");
+          if (sm.mcast.xhr == null) {
+            // inject jquery?
+            let js_j = document.createElement("script");
+            js_j.src = "//code.jquery.com/jquery-3.6.0.min.js";
+            js_j.onload = function () {
+              $.ajaxSetup({
+                xhrFields: {
+                  //SeqId (OOO) passed via cookies
+                  withCredentials: true
+                }
+              });
+              sm.mcast.receive(true);
+              sm.mcast.post();
+            };
+            document.head.appendChild(js_j);
           } else {
-            // sm.mcast.getXhr.abort(?)
+            //sm.mcast.receive(true);
           }
         } else {
           // tool methods
           let el = document.querySelector(".edit.sel");
-          if (el != null) {
+          if (el != null && title != "fa-layer-group") {
             let val = sm.tools.set(el, title);
-            val = val ? { value: val } : {};
-            sm.mcast.add(el.id, title, val);
+            sm.mcast.add(el.id, title, { value: val });
           }
         }
       }
@@ -682,11 +731,11 @@ sm = {
       return canvas;
     },
     color: function () {
-      sm.var.tools
-        .querySelector("#color")
+      document
+        .getElementById("fa-eye-dropper")
         .addEventListener("input", function (event) {
           let st = " -0.25rem 0 0 -1px inset";
-          sm.var.tools.querySelector(".fa-fill").style.boxShadow =
+          sm.var.tools.querySelector(".fa-eye-dropper").style.boxShadow =
             event.target.value + st;
 
           let el = document.querySelector(".edit.sel");
@@ -695,12 +744,12 @@ sm = {
             el.firstElementChild.style.color = col;
             let path = el.querySelector("svg path:last-child");
             path && (path.style.fill = col);
-            sm.mcast.add(el.id, "fa-fill", { value: col });
+            sm.mcast.add(el.id, "fa-eye-dropper", { value: col });
           }
         });
     },
     render: function (output) {
-      console.log("render frames to gif");
+      console.log("render gif");
       // css link rel=stylesheet must be crossorigin
       document.body.classList.add("render");
       output.innerHTML = "";
@@ -774,12 +823,19 @@ sm = {
     }
   },
   mcast: {
-    //httprelay.io/features/mcast/
-    uid: "u" + Date.now(),
-    id: 0,
-    mcastUrl: "//demo.httprelay.io/mcast/stockmeme_cp2",
-    getXhr: undefined, // global history
-    history: { time: 0, events: [] }, // local history
+    url: function () {
+      //httprelay.io/features/mcast/
+      let mcastId = document.getElementById("mcastId").value;
+      return "//demo.httprelay.io/mcast/" + mcastId;
+    },
+    xhr: null,
+    log: {
+      uid: "u" + Date.now(),
+      id: 0,
+      time: 0,
+      last: {},
+      events: []
+    },
     LZW: {
       en: function (c) {
         var x = "charCodeAt",
@@ -824,28 +880,36 @@ sm = {
       if (!idx || !type) {
         return;
       }
-
+      // log event
       let entryNew = {
         idx: idx,
         type: type
-        //time: Date.now(),//events filters?
+        // events granular via Date.now()...?
       };
+      // flatten
       for (var key in opts) {
-        entryNew[key] = opts[key];
+        if (opts[key] != undefined) {
+          entryNew[key] = opts[key];
+        }
       }
-
-      let events = sm.mcast.history.events;
+      // differ
+      let events = sm.mcast.log.events;
       for (let i = events.length - 1; i > 0; i--) {
-        // trash stale duplicates, but ignore draw
         let entryOld = events[i];
         if (entryOld.idx == entryNew.idx) {
-          let stale =
-            entryOld.type == entryNew.type &&
-            entryNew.type != "canvas" &&
-            entryNew.type != "svg" &&
-            entryNew.type != "path" &&
-            !(entryNew.type == "fa-eraser" && entryNew.value == "path");
-          if (stale || entryNew.type == "fa-trash-alt") {
+          // remove stale duplicates
+          let blacklist =
+            // sort
+            entryNew.type == "fa-level-up-alt" ||
+            entryNew.type == "fa-level-down-alt" ||
+            // draw
+            entryNew.type == "canvas" ||
+            entryNew.type == "svg" ||
+            entryNew.type == "path" ||
+            (entryNew.type == "fa-eraser" &&
+              (entryNew.value == "svg" || entryNew.value == "path"));
+          let criteria = entryOld.type == entryNew.type && !blacklist;
+          if (criteria || entryNew.type == "fa-trash-alt") {
             entryOld = null;
             events.splice(i, 1);
           }
@@ -858,67 +922,62 @@ sm = {
       setInterval(function () {
         // opt1: clearInterval if no receive?
         // opt2: only send if xhr state active
-        let history = sm.mcast.history;
-        if (history.events.length && sm.mcast.getXhr) {
-          history.uid = sm.mcast.uid;
-          history.time = Date.now();
-          console.log("post: ", history);
+        let log = sm.mcast.log;
+        if (log.events.length && sm.mcast.xhr) {
+          log.time = Date.now();
+          console.log("post: ", log);
           $.ajax({
-            url: sm.mcast.mcastUrl,
+            url: sm.mcast.url(),
             type: "POST",
-            data: JSON.stringify(history),
+            data: JSON.stringify(log),
             contentType: "text/plain"
-          }); // send sm history
-          history.events = [];
+          });
+          log.events = [];
         }
-        //fileMAX, LZW.en, and setInterval determine a broken image
       }, 10000);
     },
     receive: function (fromOldest) {
-      //$.ajaxSetup({
-      //  xhrFields: {
-      // SeqId (OOO) passed via cookies
-      //    withCredentials: true
-      //  }
-      //});
-      if (sm.mcast.getXhr) sm.mcast.getXhr.abort();
+      if (sm.mcast.xhr) sm.mcast.xhr.abort();
       let url = fromOldest
-        ? sm.mcast.mcastUrl + "?SeqId=0&nocache=" + $.now()
-        : sm.mcast.mcastUrl;
-      let last = sm.mcast.getXhr
-        ? JSON.parse(sm.mcast.getXhr.responseText)
-        : false;
-      sm.mcast.getXhr = $.get(url)
+        ? sm.mcast.url() + "?SeqId=0&nocache=" + $.now()
+        : sm.mcast.url();
+
+      sm.mcast.xhr = $.get(url)
         .done((data) => {
-          let history = JSON.parse(data);
-          if (history.time == last.time || history.uid == sm.mcast.uid) {
+          let user = JSON.parse(data);
+          console.log("user", user);
+          let log = sm.mcast.log;
+          if (user.uid == log.uid || user.time == log.last.time) {
             // abort if stale cookie or same user id
             console.log("expired");
             return;
           }
+          log.last = {
+            uid: user.uid,
+            time: user.time
+          };
 
           // event queue
-          for (let i = 0; i < history.events.length; i++) {
-            let entry = history.events[i];
+          for (let i = 0; i < user.events.length; i++) {
+            let entry = user.events[i];
             console.log("entry", i, entry);
-
-            //idx, type, value, etc.
+            // synchronize stage (create or update)
             let el = sm.var.stage.querySelector("#" + entry.idx);
             let type = entry.type;
             if (type == "drop" && el == null) {
+              // if corrupt: fileMAX, LZW.en, post(setInterval), and xhr.abort
               let sel = document.createElement("div");
               let de = sm.mcast.LZW.de(entry.value);
               sel.innerHTML = de;
-              sel = sel.firstChild; // or div.childNodes
+              sel = sel.firstChild;
               sel.classList.remove("edit");
-              // event listeners
+              // element to stage
               sm.interact.drag(sel);
               sm.interact.resize(sel);
-
               sm.var.stage.appendChild(sel);
             } else if (el != null) {
+              // io.edit
               switch (type) {
-                // io.edit
                 case "canvas":
                   el = el.querySelector("canvas");
                   sm.stage.canvas(el, entry.x, entry.y, entry.col);
@@ -932,11 +991,6 @@ sm = {
                   el = el.querySelector("textarea");
                   el.value = entry.value;
                   break;
-                //case "fa-eraser":
-                //sm.tools.set();
-                //eraser
-                //break;
-                // io.labels
                 default:
                   sm.tools.set(el, type, entry);
               }
