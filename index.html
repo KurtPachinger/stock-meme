@@ -13,36 +13,26 @@
 
   <!--modify-->
   <fieldset id="ui">
-    <label class="fas fa-expand" title="Toggle dense layout.">
+    <label class="fas fa-expand" title="Toggle dense layout">
       <span>dense</span>
     </label>
-    <label class="fas fa-adjust" title="Toggle color scheme.">
+    <label class="fas fa-adjust" title="Toggle color scheme">
       <span>theme</span>
     </label>
     <hr />
-    <label class="fas fa-trash-alt" title="Remove from stage. (Delete)">
-      <span>trash</span>
-    </label>
-    <label class="fas fa-eraser" title="Erase pixels or points. (Backspace)">
-      <span>erase</span>
-      <input type="checkbox" id="erase" />
-    </label>
-    <label class="fas fa-fill" title="Apply color.">
-      <span>color</span>
-      <input type="color" value="#8f8f8f" id="color" />
-    </label>
-    <label class="fas fa-sort-amount-down" title="Send back one layer. ([/])">
-      <span>order</span>
-    </label>
-    <label class="fas fa-asterisk" title="All set title. Link sets src. External link sets href. Canvas sets onionskin if prefix is period.">
-      <span>meta</span>
+    <label class="fas fa-running" title="Share stage via HTTPRelay mcast">
+      <span>relay</span>
       <input type="checkbox" />
-      <input type="text" placeholder="title, url, or .onion" id="meta" />
+      <input type="text" id="mcastId" value="sm_mcast_0x">
     </label>
-    <label class="far fa-play-circle" title="Apply Animate.css effect.">
-      <span>motion</span>
+    <label class="fas fa-film" title="Render animated gif">
+      <span>render</span>
+      <div id="fa-film"></div>
+    </label>
+    <label class="far fa-play-circle" title="Apply Animate.css effect">
+      <span>effect</span>
       <input type="checkbox" />
-      <select id="animate">
+      <select id="fa-play-circle">
         <option value="none">none</option>
         <option value="bounce">bounce</option>
         <option value="flash">flash</option>
@@ -61,21 +51,61 @@
         <option value="zoomOut">zoomOut</option>
       </select>
     </label>
-    <hr />
-    <label class="fas fa-film" title="Render animated gif.">
-      <span>render</span>
-      <div id="frames"></div>
+    <label class="fas fa-asterisk" title="Set link url. Set transform property(no,space,value). Prefix keyframes .onion.">
+      <span>meta</span>
+      <input type="checkbox" />
+      <input type="text" placeholder="title, url, or .onion" id="fa-asterisk" />
     </label>
     <hr />
-    <label class="fas fa-running" title="Share stage via HTTPRelay mcast.">
-      <span>relay</span>
-      <input type="checkbox" id="relay" />
+    <label class="fas fa-layer-group" title="Arrange layout">
+      <span>layout</span>
+      <input type="checkbox" />
+      <div class="more">
+        <label class="fas fa-level-down-alt w25" title="Back ([)">
+          <span>layer down</span>
+        </label>
+        <label class="fas fa-level-up-alt w25" title="Forward (])">
+          <span>layer up</span>
+        </label>
+        <label class="fas fa-arrows-alt-v w25" title="Flip vertical">
+          <span>flip vert</span>
+        </label>
+        <label class="fas fa-arrows-alt-h w25" title="Flip horizontal">
+          <span>flip horz</span>
+        </label>
+        <label class="fas fa-sync-alt w25" title="Rotate 90">
+          <span>rotate</span>
+        </label>
+        <label class="fas fa-star-half-alt w25" title="Knockout">
+          <span>knockout</span>
+        </label>
+        <label class="fas fa-text-height w25" title="Zoom">
+          <span>zoom</span>
+        </label>
+        <label class="fas fa-align-right w25" title="Align right">
+          <span>align right</span>
+        </label>
+      </div>
+    </label>
+    <label class="fas fa-eye-dropper" title="Apply color">
+      <span>color</span>
+      <input type="color" value="#8f8f8f" id="fa-eye-dropper" />
+    </label>
+    <label class="fas fa-eraser" title="Erase pixels or points (Backspace)">
+      <span>erase</span>
+      <input type="checkbox" id="fa-eraser" />
+    </label>
+
+    <hr />
+
+    <label class="ico fas fa-trash-alt" title="Remove from stage (Delete)">
+      <span>trash</span>
     </label>
   </fieldset>
 
   <!--create-->
   <fieldset>
-    <label class="dir fas fa-font" title="Add file or text.">
+    <label class="dir fas fa-font" title="Add file or text">
       <span>text</span>
       <input type="file" id="txt" accept="text/*" multiple />
     </label>
@@ -108,11 +138,11 @@
 
   </fieldset>
   <fieldset>
-    <label class="dir fas fa-images" title="Add photo, graphic or link.">
+    <label class="dir fas fa-images" title="Add photo, graphic or link">
       <span>media</span>
       <input type="file" id="img" accept="image/*" multiple />
     </label>
-    <div class="ico fas art fa-edit">
+    <div class="ico fas art fa-pencil-alt">
       <canvas width="512" height="512"></canvas>
     </div>
     <div class="ico fas art fa-draw-polygon">
@@ -131,7 +161,7 @@
     </div>
   </fieldset>
   <fieldset>
-    <label class="dir fas fa-icons" title="Add icon from Font Awesome.">
+    <label class="dir fas fa-icons" title="Add icon from Font Awesome">
       <span>icon</span>
     </label>
     <div class="page current" data-title="avatar">
@@ -157,7 +187,6 @@
       <div class="ico fas fa-skull"></div>
     </div>
     <div class="page" data-title="props">
-      <div class="ico fas fa-heart"></div>
       <div class="ico fas fa-ban"></div>
       <div class="ico fas fa-gem"></div>
       <div class="ico fas fa-bomb"></div>
@@ -177,6 +206,7 @@
       <div class="ico fas fa-glass-martini"></div>
       <div class="ico fas fa-book"></div>
       <div class="ico fas fa-phone"></div>
+      <div class="ico fas fa-pager"></div>
     </div>
     <div class="page" data-title="activity">
       <div class="ico fas fa-futbol"></div>
@@ -204,15 +234,23 @@
       <div class="ico fas fa-hammer"></div>
       <div class="ico fas fa-fish"></div>
     </div>
-    <div class="page" data-title="bubbles">
+    <div class="page" data-title="shapes">
       <div class="ico fas fa-comment-alt"></div>
       <div class="ico fas fa-comment"></div>
       <div class="ico fas fa-comments"></div>
+      <div class="ico fas fa-cloud"></div>
       <div class="ico fas fa-sticky-note"></div>
       <div class="ico fas fa-envelope-open"></div>
       <div class="ico fas fa-clipboard"></div>
       <div class="ico fas fa-scroll"></div>
-      <div class="ico fas fa-pager"></div>
+      <div class="ico fas fa-heart"></div>
+      <div class="ico fas fa-star"></div>
+      <div class="ico fas fa-square"></div>
+      <div class="ico fas fa-circle"></div>
+      <div class="ico fas fa-play"></div>
+      <div class="ico fas fa-bookmark"></div>
+      <div class="ico fas fa-map-marker"></div>
+      <div class="ico fas fa-calendar"></div>
     </div>
   </fieldset>
 
