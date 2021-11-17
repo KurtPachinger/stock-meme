@@ -751,8 +751,8 @@ sm = {
     render: function (output) {
       console.log("render gif");
       // css link rel=stylesheet must be crossorigin
-      document.body.classList.add("render");
       output.innerHTML = "";
+      sm.var.stage.classList.add("render");
 
       // reduce filesize
       let sz = sm.var.stage.getBoundingClientRect();
@@ -761,7 +761,7 @@ sm = {
       // time progress
       let prog = {
         total: 1000,
-        step: 250
+        step: 100
       };
       prog.load = prog.queue = prog.total / prog.step;
 
@@ -775,7 +775,7 @@ sm = {
         if (prog.queue > 0) {
           prog.queue--;
           domtoimage
-            .toJpeg(sm.var.stage, { quality: 0.5 })
+            .toPng(sm.var.stage, { quality: 0.5 })
             .then(function (dataUrl) {
               var img = new Image();
               img.onload = function () {
@@ -805,7 +805,7 @@ sm = {
           },
           function (obj) {
             if (!obj.error) {
-              document.body.classList.remove("render");
+              sm.var.stage.classList.remove("render");
               output.innerHTML = "";
 
               let base64 = obj.image,
