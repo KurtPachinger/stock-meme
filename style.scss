@@ -68,9 +68,11 @@ html {
   body {
     touch-action: none;
     overflow: hidden;
+    background-color: var(--bg);
 
-    &.render {
+    .render {
       // hide ui during render
+      //transform: scale(0.5);
       .sel,
       canvas,
       svg,
